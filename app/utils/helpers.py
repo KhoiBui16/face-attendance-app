@@ -1,8 +1,8 @@
+import pickle
 import os
 import pandas as pd
 from datetime import datetime
 import cv2
-import csv
 
 def get_project_root():
     """Get the absolute path to the project root directory."""
@@ -154,3 +154,12 @@ def save_uploaded_video(video_file, username, action, base_folder="data/logs/vid
     except Exception as e:
         print(f"[ERROR] Lỗi khi lưu video: {e}")
         return None
+
+
+def has_trained_data(username):
+    label_path = get_path("data/dataset/names.pkl")
+    if not os.path.exists(label_path):
+        return False
+    with open(label_path, "rb") as f:
+        labels = pickle.load(f)
+    return username in labels
