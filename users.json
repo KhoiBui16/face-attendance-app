@@ -1,0 +1,32 @@
+[
+  {
+    "username": "admin",
+    "password": "admin",
+    "is_admin": true,
+    "is_allowed": true
+  },
+  {
+    "username": "ronaldo",
+    "password": "1",
+    "is_allowed": true,
+    "is_admin": false
+  },
+  {
+    "username": "pele",
+    "password": "1",
+    "is_allowed": true,
+    "is_admin": false
+  },
+  {
+    "username": "jack",
+    "password": "1",
+    "is_allowed": true,
+    "is_admin": false
+  },
+  {
+    "username": "mbappe",
+    "password": "1",
+    "is_allowed": false,
+    "is_admin": false
+  }
+]
