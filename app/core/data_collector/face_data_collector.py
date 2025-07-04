@@ -6,18 +6,30 @@ from skimage.feature import hog
 from core.face_detection.detector import detect_faces
 from utils.helpers import get_path
 from core.config import HOG_CONFIG
-import imgaug.augmenters as iaa
+import albumentations as A
+
 
 def augment_image(image):
     if not isinstance(image, np.ndarray):
         print(f"[ERROR] Input image is not a NumPy array: {type(image)}")
         return []
-    augmented_images = [image]
-    augmented_images.append(iaa.Fliplr(1.0).augment_image(image))
-    augmented_images.append(iaa.Multiply(1.2).augment_image(image))
-    augmented_images.append(iaa.Multiply(0.8).augment_image(image))
-    return augmented_images
 
+    augmented_images = [image]
+
+    transforms = [
+        A.HorizontalFlip(p=1.0),
+        A.Multiply((1.2, 1.2), p=1.0),
+        A.Multiply((0.8, 0.8), p=1.0)
+    ]
+
+    for transform in transforms:
+        try:
+            augmented = transform(image=image)
+            augmented_images.append(augmented['image'])
+        except Exception as e:
+            print(f"[ERROR] Error during augmentation: {e}")
+
+    return augmented_images
 
 def extract_hog_features(roi, size=(100, 100)):
     """
