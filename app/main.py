@@ -18,7 +18,6 @@ def main():
     else:
         # Nếu là admin → chuyển sang trang quản trị
         if is_admin():
-            # ⚠ Đặt đúng tên như trong st.set_page_config(page_title="...")
             st.switch_page("Trang quản trị viên")
         else:
             # Người dùng thông thường
@@ -26,7 +25,6 @@ def main():
             st.sidebar.text(f"👤 Đăng nhập: {st.session_state.username}")
             st.sidebar.text(f"🔐 Quyền: Người dùng")
 
-            # Điều hướng đơn giản
             page = st.sidebar.radio("Chọn trang", ["Điểm danh"], index=0)
 
             # Lần đầu đăng nhập xong thì chuyển hướng
@@ -35,7 +33,6 @@ def main():
                 st.session_state.just_logged_in = False
                 st.rerun()
 
-            # ⚠ Đúng tên như đặt ở `page_title` trong `attendance.py`
             st.switch_page("Trang điểm danh")
 
 
