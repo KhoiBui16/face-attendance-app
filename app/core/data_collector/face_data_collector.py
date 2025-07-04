@@ -138,15 +138,12 @@ def collect_face_data(cap, name, save_dir="data/dataset", num_samples=10, displa
                     frame = cv2.rectangle(frame, (x, y), (x+w, y+h), (0, 255, 0), 2)
                     cv2.putText(frame, f"{len(collected_faces)}/{num_samples}", (x, y-10), cv2.FONT_HERSHEY_SIMPLEX, 0.7, (0, 255, 0), 2)
                 display_callback(frame, len(collected_faces), num_samples)
-            if cv2.waitKey(10) == 27:
-                print("[DEBUG] Collection stopped by user (ESC)")
-                break
+
     except Exception as e:
         print(f"[ERROR] Lỗi khi thu thập dữ liệu: {e}")
         return False
     finally:
         cap.release()
-        cv2.destroyAllWindows()
 
     if not collected_faces:
         print("[ERROR] Không thu thập được khuôn mặt.")

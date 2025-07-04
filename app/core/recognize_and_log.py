@@ -231,10 +231,6 @@ def process_frame_and_recognize(
                     continue
 
             attempt += 1
-            if cv2.waitKey(10) == 27:  # ESC để thoát (chỉ cho webcam)
-                result_message = "❌ Đã hủy nhận diện."
-                recognized = True
-                break
 
         if not recognized and not result_message:
             result_message = (
@@ -264,12 +260,6 @@ def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
             video_placeholder.empty()
     except Exception as e:
         print(f"[WARN] Lỗi khi xoá placeholder: {e}")
-
-    try:
-        if hasattr(cv2, "destroyAllWindows"):
-            cv2.destroyAllWindows()
-    except Exception as e:
-        print(f"[WARN] Không thể gọi cv2.destroyAllWindows(): {e}")
 
     try:
         if video_file is not None and temp_file_path and os.path.exists(temp_file_path):
