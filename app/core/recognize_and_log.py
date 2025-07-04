@@ -256,7 +256,10 @@ def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
     if cap is not None:
         cap.release()
     video_placeholder.empty()
-    cv2.destroyAllWindows()
+    try:
+        cv2.destroyAllWindows()
+    except cv2.error:
+        pass  
     if video_file is not None and temp_file_path:
         try:
             os.unlink(temp_file_path)
