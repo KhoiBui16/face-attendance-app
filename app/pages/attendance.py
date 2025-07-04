@@ -127,9 +127,9 @@ def main():
                                 return
                             # Check if content type is video
                             content_type = response.headers.get("content-type", "")
-                            if not content_type.startswith("video/"):
+                            if not (content_type.startswith("video/") or content_type == "application/octet-stream"):
                                 st.session_state.result_message = (
-                                    "❌ URL không dẫn đến tệp video hợp lệ (mp4, avi)."
+                                    f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
                                 )
                                 st.session_state.last_action = "check-in"
                                 display_message(
@@ -214,9 +214,9 @@ def main():
                                 return
                             # Check if content type is video
                             content_type = response.headers.get("content-type", "")
-                            if not content_type.startswith("video/"):
+                            if not (content_type.startswith("video/") or content_type == "application/octet-stream"):
                                 st.session_state.result_message = (
-                                    "❌ URL không dẫn đến tệp video hợp lệ (mp4, avi)."
+                                    f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
                                 )
                                 st.session_state.last_action = "check-out"
                                 display_message(

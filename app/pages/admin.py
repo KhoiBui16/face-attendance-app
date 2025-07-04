@@ -103,12 +103,11 @@ def main():
                             )
                             st.stop()
                         # Check if content type is video
+                        # Cho phép cả video và octet-stream (GitHub Raw dùng octet-stream)
                         content_type = response.headers.get("content-type", "")
-                        if not content_type.startswith("video/"):
-                            st.error(
-                                "❌ URL không dẫn đến tệp video hợp lệ (mp4, avi)."
-                            )
-                            st.stop()
+                        if not (content_type.startswith("video/") or content_type == "application/octet-stream"):
+                            st.warning(f"⚠️ Content-Type không phải video trực tiếp: {content_type}. Vẫn tiếp tục tải thử.")
+
                         # Save video temporarily
                         temp_video_path = get_path(f"data/temp/{name}_temp_video.mp4")
                         os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
