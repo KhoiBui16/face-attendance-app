@@ -1,5 +1,7 @@
 import pickle
 import streamlit as st
+import requests
+import os
 from core.train_model import train_model
 from core.data_collector.webcam_data_collector import collect_data_from_webcam
 from core.data_collector.video_data_collector import collect_data_from_uploaded_video
@@ -19,7 +21,7 @@ def main():
     # Sidebar
     if is_logged_in():
         st.sidebar.title("Điều hướng")
-        st.sidebar.write(f"Đăng nhập với: {st.session_state.get('username', 'N/A')}")
+        st.sidebar.text(f"Đăng nhập với: {st.session_state.get('username', 'N/A')}")
         st.sidebar.text(f"Quyền: {'Admin' if is_admin() else 'Người dùng'}")
         if st.sidebar.button("Đăng xuất"):
             logout()
@@ -35,9 +37,10 @@ def main():
     st.subheader("Thu thập dữ liệu và huấn luyện")
     name = st.text_input("Nhập tên nhân viên để thu thập:")
     upload_option = st.radio(
-        "Chọn nguồn thu thập", ["Webcam", "Tải video"], horizontal=True
+        "Chọn nguồn thu thập", ["Webcam", "Tải video", "URL"], horizontal=True
     )
     video_file = None
+    video_url = None
 
     # Khởi tạo biến lưu video tạm trong session_state
     if "uploaded_video" not in st.session_state:
@@ -48,12 +51,23 @@ def main():
             "Tải lên video khuôn mặt (mp4, avi)", type=["mp4", "avi"]
         )
         if video_file is not None:
-            # Lưu video tạm vào session_state thay vì lưu ngay vào thư mục
             st.session_state.uploaded_video = video_file
             st.success("✅ Video đã được tải lên, sẵn sàng để thu thập.")
         else:
-            # Xóa video tạm nếu không có file mới
             st.session_state.uploaded_video = None
+
+    elif upload_option == "URL":
+        video_url = st.text_input(
+            "Nhập URL video (mp4, avi):", placeholder="https://example.com/video.mp4"
+        )
+        if video_url:
+            # Convert GitHub URL to raw URL if necessary
+            if "github.com" in video_url and "blob" in video_url:
+                video_url = video_url.replace(
+                    "github.com", "raw.githubusercontent.com"
+                ).replace("/blob/", "/")
+            st.session_state.uploaded_video = video_url
+            st.success("✅ URL đã được nhập, sẵn sàng để thu thập.")
 
     if st.button("Bắt đầu thu thập") and name:
         if not name:
@@ -67,7 +81,6 @@ def main():
                     if st.session_state.uploaded_video is None:
                         st.error("Vui lòng tải lên video trước.")
                         st.stop()
-                    # Lưu video vào thư mục chỉ khi nhấn "Bắt đầu thu thập"
                     saved_video_path = save_uploaded_video(
                         video_file=st.session_state.uploaded_video,
                         username=name,
@@ -75,6 +88,37 @@ def main():
                     )
                     if not saved_video_path:
                         st.error("❌ Lỗi khi lưu video.")
+                        st.stop()
+
+                elif upload_option == "URL":
+                    if not st.session_state.uploaded_video:
+                        st.error("Vui lòng nhập URL video trước.")
+                        st.stop()
+                    try:
+                        # Download video from URL
+                        response = requests.get(video_url, stream=True)
+                        if response.status_code != 200:
+                            st.error(
+                                f"❌ Lỗi khi tải video từ URL: HTTP {response.status_code}"
+                            )
+                            st.stop()
+                        # Check if content type is video
+                        content_type = response.headers.get("content-type", "")
+                        if not content_type.startswith("video/"):
+                            st.error(
+                                "❌ URL không dẫn đến tệp video hợp lệ (mp4, avi)."
+                            )
+                            st.stop()
+                        # Save video temporarily
+                        temp_video_path = get_path(f"data/temp/{name}_temp_video.mp4")
+                        os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
+                        with open(temp_video_path, "wb") as f:
+                            for chunk in response.iter_content(chunk_size=8192):
+                                if chunk:
+                                    f.write(chunk)
+                        saved_video_path = temp_video_path
+                    except Exception as e:
+                        st.error(f"❌ Lỗi khi tải video từ URL: {e}")
                         st.stop()
 
                 # Thu thập dữ liệu
@@ -89,6 +133,14 @@ def main():
                         save_dir=get_path("data/dataset"),
                         num_samples=30,
                     )
+
+                # Clean up temporary video file if created
+                if (
+                    upload_option == "URL"
+                    and saved_video_path
+                    and os.path.exists(saved_video_path)
+                ):
+                    os.remove(saved_video_path)
 
                 if success:
                     label_path = get_path("data/dataset/names.pkl")
@@ -111,7 +163,7 @@ def main():
                             st.error("Lỗi khi huấn luyện mô hình.")
                 else:
                     st.error(
-                        "Không thu thập được dữ liệu. Vui lòng kiểm tra video/webcam."
+                        "Không thu thập được dữ liệu. Vui lòng kiểm tra video/webcam/URL."
                     )
             except Exception as e:
                 st.error(f"Lỗi khi thu thập hoặc huấn luyện: {e}")
@@ -170,7 +222,7 @@ def main():
     for user in users:
         if not user.get("is_admin", False):
             col1, col2, col3 = st.columns([3, 2, 1])
-            col1.write(user["username"])
+            col1.text(user["username"])
             allow = col2.checkbox(
                 "Cho phép", value=user.get("is_allowed", False), key=user["username"]
             )
