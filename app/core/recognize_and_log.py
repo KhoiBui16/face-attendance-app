@@ -253,33 +253,30 @@ def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
     """
     Dọn dẹp tài nguyên: đóng video, xóa file tạm, xóa placeholder.
     """
-    if cap is not None:
-        try:
+    try:
+        if cap is not None:
             cap.release()
-        except Exception as e:
-            print(f"[WARN] Lỗi khi release video: {e}")
+    except Exception as e:
+        print(f"[WARN] Lỗi khi release video: {e}")
 
-    if video_placeholder:
-        try:
+    try:
+        if video_placeholder:
             video_placeholder.empty()
-        except Exception as e:
-            print(f"[WARN] Không thể xoá placeholder: {e}")
+    except Exception as e:
+        print(f"[WARN] Lỗi khi xoá placeholder: {e}")
 
-    # Ngăn lỗi destroyAllWindows trong môi trường không GUI
     try:
         if hasattr(cv2, "destroyAllWindows"):
             cv2.destroyAllWindows()
     except Exception as e:
-        print(f"[WARN] Lỗi khi gọi destroyAllWindows: {e}")
+        print(f"[WARN] Không thể gọi cv2.destroyAllWindows(): {e}")
 
-    # Xoá file video tạm (nếu có)
-    if video_file is not None and temp_file_path:
-        try:
-            if os.path.exists(temp_file_path):
-                os.remove(temp_file_path)
-                print(f"[DEBUG] Đã xóa file video tạm: {temp_file_path}")
-        except Exception as e:
-            print(f"[ERROR] Lỗi khi xóa file tạm: {e}")
+    try:
+        if video_file is not None and temp_file_path and os.path.exists(temp_file_path):
+            os.remove(temp_file_path)
+            print(f"[DEBUG] Đã xóa file video tạm: {temp_file_path}")
+    except Exception as e:
+        print(f"[ERROR] Lỗi khi xóa file tạm: {e}")
 
 
 def recognize_and_log(action="check-in", video_file=None):
