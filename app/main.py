@@ -23,11 +23,6 @@ def main():
             admin_main()
         else:
             # Người dùng thông thường
-            st.sidebar.title("Điều hướng")
-            st.sidebar.text(f"👤 Đăng nhập: {st.session_state.username}")
-            st.sidebar.text(f"🔐 Quyền: Người dùng")
-
-            page = st.sidebar.radio("Chọn trang", ["Điểm danh"], index=0)
 
             # Lần đầu đăng nhập xong thì chuyển hướng
             if st.session_state.get("just_logged_in", False):
