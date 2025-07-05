@@ -2,15 +2,21 @@
 ---
 
 ## 📑 Table of Contents
-- [📝 Project Description](#-project-description)
-- [📁 Project Structure](#-project-structure)
-- [🔐 Features](#-features)
-- [🎥 Demo Video](#-demo-video)
-- [📊 Sample Dataset](#-sample-dataset)
-- [🚀 How to Run Locally](#-how-to-run-locally)
-- [🔐 Note](#-note)
-- [🛠 Tech Stack](#-tech-stack)
-- [📬 Contact](#-contact)
+- [📷 Face Attendance App](#-face-attendance-app)
+  - [📑 Table of Contents](#-table-of-contents)
+  - [📝 Project Description](#-project-description)
+  - [📁 Project Structure](#-project-structure)
+  - [🔐 Features](#-features)
+  - [🎥 Demo Video](#-demo-video)
+  - [📊 Sample Dataset](#-sample-dataset)
+  - [🚀 How to Run Locally](#-how-to-run-locally)
+    - [1. Clone the repository](#1-clone-the-repository)
+    - [2. Set up your environment](#2-set-up-your-environment)
+    - [3. Install dependencies](#3-install-dependencies)
+    - [4. Run the app](#4-run-the-app)
+  - [🔐 Note](#-note)
+  - [🛠 Tech Stack](#-tech-stack)
+  - [📬 Contact](#-contact)
 
 ---
 
@@ -52,34 +58,36 @@ face-attendance-app/
 │   │   ├── config.py
 │   │   ├── recognize_and_log.py
 │   │   └── train_model.py
-│   ├── pages/
+│   │   └── haarcascade_frontalface_default.xml
+│   ├── modules/
 │   │   ├── admin.py
 │   │   └── attendance.py
-│   └── utils/
-│       ├── auth.py
-│       ├── helpers.py
-│       └── user_utils.py
-├── data/
-│   ├── dataset/
-│   │   ├── faces.pkl
-│   │   └── names.pkl
-│   ├── logs/
-│   │   ├── images/
-│   │   │   └── by_date/
-│   │   │       └── [date]/
-│   │   │           └── [image_files]
-│   │   ├── videos/
-│   │   │   └── by_date/
-│   │   │       └── [date]/
-│   │   │           └── [video_files]
-│   │   └── attendances_[username].csv
-│   ├── models/
-│   │   └── model.pkl
-│   ├── test/
-│   │   └── [username].mp4
+│   ├── utils/
+│   │   ├── auth.py
+│   │   ├── helpers.py
+│   │   └── user_utils.py
+│   └── data/
+│       ├── dataset/
+│       │   ├── faces.pkl
+│       │   └── names.pkl
+│       ├── logs/
+│       │   ├── images/
+│       │   │   └── by_date/
+│       │   │       └── [date]/
+│       │   │           └── [image_files]
+│       │   ├── videos/
+│       │   │   └── by_date/
+│       │   │       └── [date]/
+│       │   │           └── [video_files]
+│       │   └── attendances_[username].csv
+│       ├── models/
+│       │   └── model.pkl
+│       └── users.json
+├── image/
 │   ├── train/
 │   │   └── [username].mp4
-│   └── users.json
+│   ├── test/
+│   │   └── [username].mp4
 ├── requirements.txt
 ├── packages.txt
 ├── .gitignore
