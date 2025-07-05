@@ -31,7 +31,7 @@ The `face-attendance-app` is a secure and user-friendly Streamlit application fo
   - View a table of all members' attendance (username, check-in time, check-out time, working hours, position).
   - Delete user data and attendance logs.
   - Store attendance data in CSV files and user credentials (username, password) in `users.json`.
-- **Model Performance**: The face recognition model achieves an accuracy of 70% on the test set.
+- **Model Performance**: The face recognition model achieves an accuracy of approximately 60–70% on the test set.
 
 ---
 
