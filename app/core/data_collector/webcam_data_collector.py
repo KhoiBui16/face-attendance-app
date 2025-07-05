@@ -1,5 +1,5 @@
 import cv2
-from core.data_collector.face_data_collector import collect_face_data
+from .face_data_collector import collect_face_data
 import streamlit as st
 
 def collect_data_from_webcam(name, save_dir="data/dataset", num_samples=10, camera_index=0):
