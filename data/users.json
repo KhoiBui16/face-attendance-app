@@ -22,14 +22,4 @@
     "password": "1",
     "is_allowed": true,
     "is_admin": false
-<<<<<<< HEAD
-=======
-  },
-  {
-    "username": "mbappe",
-    "password": "1",
-    "is_allowed": true,
-    "is_admin": false
->>>>>>> 9e4df25d93a5c1b9e78c6b36fc8a05d95dafb635
   }
-]
