@@ -1,2 +1,6 @@
 name,date,time-check-in,time-check-out,time-working,position
+<<<<<<< HEAD
 ronaldo,2025-07-05,2025-07-05 22:36:41,2025-07-05 22:41:45,0.08,attendance
+=======
+ronaldo,2025-07-05,2025-07-05 20:10:51,2025-07-05 20:14:27,0.06,attendance
+>>>>>>> 9e4df25d93a5c1b9e78c6b36fc8a05d95dafb635
