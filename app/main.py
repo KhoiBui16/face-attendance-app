@@ -1,8 +1,8 @@
 import streamlit as st
 from utils.auth import login_page, register_page
 from utils.user_utils import is_logged_in, is_admin
-from pages import admin, attendance
-
+from modules.admin import main as admin_main
+from modules.attendance import main as attendance_main
 
 def main():
     st.set_page_config(page_title="📷 Face Attendance App", layout="centered")
@@ -19,7 +19,7 @@ def main():
     else:
         # Nếu là admin → chuyển sang trang quản trị
         if is_admin():
-            admin.main()
+            admin_main()
         else:
             # Người dùng thông thường
             if st.session_state.get("just_logged_in", False):
@@ -27,7 +27,7 @@ def main():
                 st.session_state.just_logged_in = False
                 st.rerun()
 
-            attendance.main()
+            attendance_main()
 
 
 if __name__ == "__main__":
