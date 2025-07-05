@@ -18,8 +18,8 @@ def augment_image(image):
 
     transforms = [
         A.HorizontalFlip(p=1.0),
-        A.Multiply((1.2, 1.2), p=1.0),
-        A.Multiply((0.8, 0.8), p=1.0)
+        A.ColorJitter(brightness=(1.2, 1.2), p=1.0),  # Tăng độ sáng
+        A.ColorJitter(brightness=(0.8, 0.8), p=1.0)   # Giảm độ sáng
     ]
 
     for transform in transforms:

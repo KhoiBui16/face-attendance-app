@@ -17,42 +17,42 @@ def validate_data(face_path, label_path):
 
         if len(faces) != len(labels):
             print(
-                f"[ERROR] Số lượng khuôn mặt ({len(faces)}) không khớp với nhãn ({len(labels)})"
+                f"[LỖI] Số lượng khuôn mặt ({len(faces)}) không khớp với nhãn ({len(labels)})"
             )
             return False
 
         if len(faces) == 0 or len(labels) == 0:
-            print("[ERROR] Dữ liệu khuôn mặt hoặc nhãn rỗng.")
+            print("[LỖI] Dữ liệu khuôn mặt hoặc nhãn rỗng.")
             return False
 
         unique_labels = set(labels)
-        print(f"[INFO] Tìm thấy {len(unique_labels)} nhãn: {unique_labels}")
+        print(f"[THÔNG TIN] Tìm thấy {len(unique_labels)} nhãn: {unique_labels}")
         if len(unique_labels) < 2:
-            print(f"[INFO] Cần ≥2 nhãn để huấn luyện. Dữ liệu đã lưu, chờ thêm nhãn.")
+            print(
+                f"[THÔNG TIN] Cần ≥2 nhãn để huấn luyện. Dữ liệu đã lưu, chờ thêm nhãn."
+            )
             return False
         return True
-
     except Exception as e:
-        print(f"[ERROR] Lỗi khi kiểm tra dữ liệu: {e}")
+        print(f"[LỖI] Lỗi khi kiểm tra dữ liệu: {e}")
         return False
 
 
 def train_model(
-    model_type="adaboost",
+    model_type="svm",
     face_path="data/dataset/faces.pkl",
     label_path="data/dataset/names.pkl",
     save_path="data/models/model.pkl",
 ):
-
+    """Huấn luyện mô hình và lưu vào file."""
     face_path = get_path(face_path)
     label_path = get_path(label_path)
     save_path = get_path(save_path)
 
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
-    # print(f"[DEBUG] Creating model directory: {os.path.dirname(save_path)}")
 
     if not os.path.exists(face_path) or not os.path.exists(label_path):
-        print("[ERROR] Face or label data not found.")
+        print("[LỖI] Không tìm thấy dữ liệu khuôn mặt hoặc nhãn.")
         return False
 
     if not validate_data(face_path, label_path):
@@ -72,16 +72,23 @@ def train_model(
         )
 
         print(
-            f"[DEBUG] Training set: {len(X_train)} samples, Test set: {len(X_test)} samples"
+            f"[GỠ LỖI] Tập huấn luyện: {len(X_train)} mẫu, Tập kiểm tra: {len(X_test)} mẫu"
         )
 
         # Huấn luyện trên tập train
         recognizer.model.fit(X_train, y_train)
 
+        # Kiểm tra classes_ sau khi huấn luyện
+        if not hasattr(recognizer.model, "classes_"):
+            print(f"[LỖI] Mô hình {model_type} không có thuộc tính classes_")
+            return False
+        recognizer.classes_ = recognizer.model.classes_
+        print(f"[GỠ LỖI] Classes: {recognizer.classes_}")
+
         # Đánh giá trên tập train
         train_predictions = recognizer.model.predict(X_train)
         train_accuracy = accuracy_score(y_train, train_predictions)
-        print(f"[INFO] Độ chính xác trên tập train: {train_accuracy:.2f}")
+        print(f"[THÔNG TIN] Độ chính xác trên tập train: {train_accuracy:.2f}")
 
         # Đánh giá trên tập test
         confidences = []
@@ -93,27 +100,31 @@ def train_model(
 
         test_accuracy = accuracy_score(y_test, predictions)
         mean_confidence = np.mean(confidences)
-        print(f"[INFO] Độ chính xác trên tập test: {test_accuracy:.2f}")
-        print(f"[INFO] Confidence trung bình trên tập test: {mean_confidence:.2f}")
-        print(f"[INFO] Gợi ý ngưỡng confidence: {max(0.5, mean_confidence - 0.1):.2f}")
+        print(f"[THÔNG TIN] Độ chính xác trên tập test: {test_accuracy:.2f}")
+        print(f"[THÔNG TIN] Confidence trung bình trên tập test: {mean_confidence:.2f}")
+        print(
+            f"[THÔNG TIN] Gợi ý ngưỡng confidence: {max(0.5, float(mean_confidence) - 0.1):.2f}"
+        )
 
         # Kiểm tra overfitting
         if train_accuracy - test_accuracy > 0.15:
             print(
-                "[WARNING] Mô hình có dấu hiệu overfitting (chênh lệch độ chính xác train/test > 0.15)"
+                "[CẢNH BÁO] Mô hình có dấu hiệu overfitting (chênh lệch độ chính xác train/test > 0.15)"
             )
 
-        if test_accuracy < 0.8:
-            print("[ERROR] Độ chính xác trên tập test quá thấp. Không lưu mô hình.")
+        if test_accuracy < 0.9:
+            print("[LỖI] Độ chính xác trên tập test quá thấp. Không lưu mô hình.")
             return False
 
         # Huấn luyện lại trên toàn bộ dữ liệu
         recognizer.train()
 
-        with open(save_path, "wb") as f:
-            pickle.dump(recognizer, f)
-        print(f"[DEBUG] Model '{model_type}' trained and saved to {save_path}")
+        # Lưu mô hình bằng phương thức save
+        recognizer.save(save_path)
+        print(
+            f"[GỠ LỖI] Mô hình '{model_type}' đã được huấn luyện và lưu vào {save_path}"
+        )
         return True
     except Exception as e:
-        print(f"[ERROR] Failed to train model: {e}")
+        print(f"[LỖI] Lỗi khi huấn luyện mô hình: {e}")
         return False
