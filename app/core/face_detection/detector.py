@@ -4,7 +4,7 @@ import os
 
 def get_haar_cascade_path():
     # Đường dẫn tuyệt đối tính từ vị trí chạy script (app/)
-    cascade_path = "../data/models/haarcascade_frontalface_default.xml"
+    cascade_path = "/data/models/haarcascade_frontalface_default.xml"
 
     if not os.path.exists(cascade_path):
         raise FileNotFoundError(f"[ERROR] Không tìm thấy cascade: {cascade_path}")
