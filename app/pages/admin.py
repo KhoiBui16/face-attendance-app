@@ -5,17 +5,9 @@ import os
 from core.train_model import train_model
 from core.data_collector.webcam_data_collector import collect_data_from_webcam
 from core.data_collector.video_data_collector import collect_data_from_uploaded_video
-from utils.helpers import (
-    read_attendance_csv,
-    preprocess_attendance,
-    get_path,
-    save_uploaded_video,
-    read_all_attendance_csv,
-    append_attendance_log,
-)
 from utils.auth import logout, load_users, save_users
 from utils.user_utils import is_admin, is_logged_in
-
+from utils.helpers import read_attendance_csv, preprocess_attendance, save_uploaded_video, read_all_attendance_csv
 
 def main():
     # Sidebar
@@ -103,13 +95,12 @@ def main():
                             )
                             st.stop()
                         # Check if content type is video
-                        # Cho phép cả video và octet-stream (GitHub Raw dùng octet-stream)
                         content_type = response.headers.get("content-type", "")
                         if not (content_type.startswith("video/") or content_type == "application/octet-stream"):
                             st.warning(f"⚠️ Content-Type không phải video trực tiếp: {content_type}. Vẫn tiếp tục tải thử.")
 
                         # Save video temporarily
-                        temp_video_path = get_path(f"data/temp/{name}_temp_video.mp4")
+                        temp_video_path = f"data/temp/{name}_temp_video.mp4"
                         os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
                         with open(temp_video_path, "wb") as f:
                             for chunk in response.iter_content(chunk_size=8192):
@@ -123,13 +114,13 @@ def main():
                 # Thu thập dữ liệu
                 if upload_option == "Webcam":
                     success = collect_data_from_webcam(
-                        name, num_samples=30, save_dir=get_path("data/dataset")
+                        name, num_samples=30, save_dir="data/dataset"
                     )
                 else:
                     success = collect_data_from_uploaded_video(
                         video_path=saved_video_path,
                         name=name,
-                        save_dir=get_path("data/dataset"),
+                        save_dir="data/dataset",
                         num_samples=30,
                     )
 
@@ -142,7 +133,7 @@ def main():
                     os.remove(saved_video_path)
 
                 if success:
-                    label_path = get_path("data/dataset/names.pkl")
+                    label_path = "data/dataset/names.pkl"
                     with open(label_path, "rb") as f:
                         labels = pickle.load(f)
                     if len(set(labels)) < 2:
@@ -151,9 +142,9 @@ def main():
                         )
                     else:
                         success_train = train_model(
-                            face_path=get_path("data/dataset/faces.pkl"),
-                            label_path=label_path,
-                            save_path=get_path("data/models/model.pkl"),
+                            face_path="data/dataset/faces.pkl",
+                            label_path="data/dataset/names.pkl",
+                            save_path="data/models/model.pkl",
                             model_type="svm",
                         )
                         if success_train:

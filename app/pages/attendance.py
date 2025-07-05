@@ -2,9 +2,9 @@ import os
 import streamlit as st
 import requests
 from core.recognize_and_log import recognize_and_log
-from utils.helpers import get_path, load_attendance_history, display_message
 from utils.auth import logout
 from utils.user_utils import is_logged_in
+from utils.helpers import load_attendance_history, display_message
 
 
 def main():
@@ -27,7 +27,7 @@ def main():
         st.stop()
 
     # Kiểm tra mô hình
-    model_path = get_path("data/models/model.pkl")
+    model_path = "data/models/model.pkl"
     if not os.path.exists(model_path):
         st.error(
             "Mô hình nhận diện chưa được huấn luyện. Vui lòng liên hệ admin để thu thập dữ liệu và huấn luyện."
@@ -127,19 +127,18 @@ def main():
                                 return
                             # Check if content type is video
                             content_type = response.headers.get("content-type", "")
-                            if not (content_type.startswith("video/") or content_type == "application/octet-stream"):
-                                st.session_state.result_message = (
-                                    f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
-                                )
+                            if not (
+                                content_type.startswith("video/")
+                                or content_type == "application/octet-stream"
+                            ):
+                                st.session_state.result_message = f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
                                 st.session_state.last_action = "check-in"
                                 display_message(
                                     st.session_state.result_message, is_success=False
                                 )
                                 return
                             # Save video temporarily
-                            temp_video_path = get_path(
-                                f"data/temp/{username}_temp_checkin.mp4"
-                            )
+                            temp_video_path = f"data/temp/{username}_temp_checkin.mp4"
                             os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
                             with open(temp_video_path, "wb") as f:
                                 for chunk in response.iter_content(chunk_size=8192):
@@ -214,19 +213,18 @@ def main():
                                 return
                             # Check if content type is video
                             content_type = response.headers.get("content-type", "")
-                            if not (content_type.startswith("video/") or content_type == "application/octet-stream"):
-                                st.session_state.result_message = (
-                                    f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
-                                )
+                            if not (
+                                content_type.startswith("video/")
+                                or content_type == "application/octet-stream"
+                            ):
+                                st.session_state.result_message = f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
                                 st.session_state.last_action = "check-out"
                                 display_message(
                                     st.session_state.result_message, is_success=False
                                 )
                                 return
                             # Save video temporarily
-                            temp_video_path = get_path(
-                                f"data/temp/{username}_temp_checkout.mp4"
-                            )
+                            temp_video_path = f"data/temp/{username}_temp_checkout.mp4"
                             os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
                             with open(temp_video_path, "wb") as f:
                                 for chunk in response.iter_content(chunk_size=8192):

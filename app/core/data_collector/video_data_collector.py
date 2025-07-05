@@ -2,20 +2,17 @@ import cv2
 import os
 import streamlit as st
 from core.data_collector.face_data_collector import collect_face_data
-from utils.helpers import get_path
-
 
 def collect_data_from_uploaded_video(
     video_path, name, save_dir="data/dataset", num_samples=100
 ):
     """
-    Thu thập dữ liệu khuôn mật từ video upload.
+    Thu thập dữ liệu khuôn mặt từ video upload.
     - video_path: Đường dẫn đến file video.
     - name: Tên người cần gắn nhãn.
     - save_dir: Thư mục lưu dữ liệu.
     - num_samples: Số lượng mẫu thu thập.
     """
-    video_path = get_path(video_path)
     if not os.path.exists(video_path):
         st.error(f"❌ Video không tồn tại tại: {video_path}")
         print(f"[ERROR] Video file does not exist: {video_path}")
