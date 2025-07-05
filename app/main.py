@@ -1,8 +1,7 @@
 import streamlit as st
 from utils.auth import login_page, register_page
 from utils.user_utils import is_logged_in, is_admin
-from pages.admin import main as admin_main
-from pages.attendance import main as attendance_main
+from pages import admin, attendance
 
 
 def main():
@@ -20,17 +19,15 @@ def main():
     else:
         # Nếu là admin → chuyển sang trang quản trị
         if is_admin():
-            admin_main()
+            admin.main()
         else:
             # Người dùng thông thường
-
-            # Lần đầu đăng nhập xong thì chuyển hướng
             if st.session_state.get("just_logged_in", False):
                 st.session_state.page = "Điểm danh"
                 st.session_state.just_logged_in = False
                 st.rerun()
 
-            attendance_main()
+            attendance.main()
 
 
 if __name__ == "__main__":
