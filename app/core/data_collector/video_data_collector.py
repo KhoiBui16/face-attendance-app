@@ -4,6 +4,7 @@ import streamlit as st
 from core.data_collector.face_data_collector import collect_face_data
 from utils.helpers import get_path
 
+
 def collect_data_from_uploaded_video(
     video_path, name, save_dir="data/dataset", num_samples=100
 ):
@@ -52,7 +53,9 @@ def collect_data_from_uploaded_video(
             st.success(f"✅ Thu thập thành công {num_samples} mẫu cho {name}")
             print(f"[SUCCESS] Thu thập thành công cho {name}")
         else:
-            st.error(f"❌ Không thu thập được dữ liệu cho {name}. Vui lòng kiểm tra video (đảm bảo có khuôn mặt rõ ràng, ánh sáng tốt).")
+            st.error(
+                f"❌ Không thu thập được dữ liệu cho {name}. Vui lòng kiểm tra video (đảm bảo có khuôn mặt rõ ràng, ánh sáng tốt)."
+            )
             print(f"[ERROR] Thu thập thất bại cho {name}")
         return result
     except Exception as e:
