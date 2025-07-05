@@ -4,7 +4,6 @@ import os
 import pickle
 from skimage.feature import hog
 from core.face_detection.detector import detect_faces
-from utils.helpers import get_path
 from core.config import HOG_CONFIG
 import albumentations as A
 
@@ -80,7 +79,6 @@ def is_good_quality(frame, x, y, w, h):
 
 
 def collect_face_data(cap, name, save_dir="data/dataset", num_samples=10, display_callback=None):
-    save_dir = get_path(save_dir)
     os.makedirs(save_dir, exist_ok=True)
     
     collected_faces = []
@@ -90,7 +88,7 @@ def collect_face_data(cap, name, save_dir="data/dataset", num_samples=10, displa
     print(f"[INFO] Bắt đầu thu thập dữ liệu cho '{name}'...")
 
     try:
-        # THAY ĐỔI: Kiểm tra độ phân giải khung hình
+        # Kiểm tra độ phân giải khung hình
         ret, frame = cap.read()
         if not ret:
             print("[ERROR] Không thể đọc khung hình từ webcam/video")
