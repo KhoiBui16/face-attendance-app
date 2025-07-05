@@ -1,5 +1,4 @@
-# 📷 Face Attendance App with Auth
-
+# 📷 Face Attendance App
 ---
 
 ## 📑 Table of Contents
@@ -39,7 +38,7 @@ The `face-attendance-app` is a secure and user-friendly Streamlit application fo
 ## 📁 Project Structure
 
 ```
-face-attendance-app-with-auth/
+face-attendance-app/
 ├── app/
 │   ├── main.py
 │   ├── core/
