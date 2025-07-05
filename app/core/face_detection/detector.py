@@ -1,13 +1,10 @@
-import os
 import cv2
+import os
 
 
 def get_haar_cascade_path():
     # Đường dẫn tuyệt đối tính từ vị trí chạy script (app/)
-    base_dir = os.path.abspath(os.path.join(os.path.dirname(__file__), "../../../"))
-    cascade_path = os.path.join(
-        base_dir, "data", "models", "haarcascade_frontalface_default.xml"
-    )
+    cascade_path = "../data/models/haarcascade_frontalface_default.xml"
 
     if not os.path.exists(cascade_path):
         raise FileNotFoundError(f"[ERROR] Không tìm thấy cascade: {cascade_path}")
