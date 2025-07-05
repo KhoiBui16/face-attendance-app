@@ -17,7 +17,7 @@
 
 ## 📝 Project Description
 
-The `face-attendance-app-with-auth` is a secure and user-friendly Streamlit application for face-based attendance detection and identification, featuring user authentication and admin access control. The application supports real-time face detection and identification for seamless attendance tracking. Key details include:
+The `face-attendance-app` is a secure and user-friendly Streamlit application for face-based attendance detection and identification, featuring user authentication and admin access control. The application supports real-time face detection and identification for seamless attendance tracking. Key details include:
 
 - **Technology**: Utilizes HAAR cascades for face detection, HOG features for face representation, and SVM or AdaBoost for classification.
 - **User Authentication**: Users must log in to perform check-in and check-out, with each action restricted to once per day.
