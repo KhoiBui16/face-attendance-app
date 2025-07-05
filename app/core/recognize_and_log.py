@@ -1,4 +1,3 @@
-# recognize_and_log.py
 import cv2
 import pickle
 import os
@@ -7,17 +6,10 @@ import tempfile
 import streamlit as st
 from core.face_detection.detector import detect_faces
 from core.data_collector.face_data_collector import extract_hog_features
-from utils.helpers import (
-    get_path,
-    append_attendance_log,
-    is_action_allowed,
-    has_trained_data,
-    display_message,
-)
+from utils.helpers import append_attendance_log, is_action_allowed, has_trained_data, display_message
 from utils.user_utils import is_logged_in
 from core.data_collector.face_data_collector import is_good_quality
 from core.face_detection.recognizer import FaceRecognizer
-
 
 def check_prerequisites(username, model_type="svm"):
     """
@@ -39,7 +31,7 @@ def check_prerequisites(username, model_type="svm"):
             None,
         )
 
-    model_path = get_path("data/models/model.pkl")
+    model_path = "data/models/model.pkl"
     if not os.path.exists(model_path):
         return False, "❌ Mô hình chưa huấn luyện. Vui lòng liên hệ admin.", None
 
@@ -61,13 +53,12 @@ def check_prerequisites(username, model_type="svm"):
         print(f"[LỖI] Lỗi tải mô hình: {e}")
         return False, f"❌ Lỗi tải mô hình: {e}", None
 
-
 def load_labels():
     """
     Tải nhãn từ names.pkl để debug.
     - Trả về: labels (hoặc None nếu lỗi).
     """
-    names_path = get_path("data/dataset/names.pkl")
+    names_path = "data/dataset/names.pkl"
     try:
         with open(names_path, "rb") as f:
             labels = pickle.load(f)
@@ -76,7 +67,6 @@ def load_labels():
     except Exception as e:
         print(f"[LỖI] Lỗi khi tải names.pkl: {e}")
         return None
-
 
 def initialize_video_source(video_file):
     """
@@ -104,7 +94,6 @@ def initialize_video_source(video_file):
         if not cap.isOpened():
             return None, temp_file_path, "❌ Không thể đọc file video."
 
-    # Kiểm tra độ phân giải
     ret, frame = cap.read()
     if not ret:
         print("[LỖI] Không thể đọc khung hình từ webcam/video")
@@ -115,13 +104,12 @@ def initialize_video_source(video_file):
         print(
             f"[CẢNH BÁO] Độ phân giải thấp ({width}x{height}), có thể ảnh hưởng đến phát hiện khuôn mặt"
         )
-    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Reset về khung hình đầu tiên
+    cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
     print(
         f"[GỠ LỖI] Thời gian khởi tạo nguồn video: {time.time() - start_time:.2f} giây"
     )
     return cap, temp_file_path, None
-
 
 def process_frame_and_recognize(
     cap, recognizer, username, action, video_placeholder, video_file
@@ -132,7 +120,7 @@ def process_frame_and_recognize(
     """
     recognized = False
     result_message = ""
-    max_attempts = 10  # Số khung hình tối đa để thử nhận diện
+    max_attempts = 10
     start_time = time.time()
 
     try:
@@ -225,7 +213,7 @@ def process_frame_and_recognize(
                             recognized = True
                             display_message(
                                 result_message,
-                                is_success=False,  # Sửa thành False cho thông báo lỗi
+                                is_success=False,
                                 placeholder=video_placeholder,
                             )
                             break
@@ -257,7 +245,6 @@ def process_frame_and_recognize(
     print(f"[GỠ LỖI] Tổng thời gian xử lý: {time.time() - start_time:.2f} giây")
     return recognized, result_message
 
-
 def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
     """
     Dọn dẹp tài nguyên: đóng video, xóa file tạm, xóa placeholder.
@@ -281,7 +268,6 @@ def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
     except Exception as e:
         print(f"[LỖI] Lỗi khi xóa file tạm: {e}")
 
-
 def recognize_and_log(action="check-in", video_file=None):
     """
     Nhận diện khuôn mặt và lưu log điểm danh.
@@ -295,22 +281,18 @@ def recognize_and_log(action="check-in", video_file=None):
     if not success:
         return False, message
 
-    # Tải nhãn để debug
     labels = load_labels()
     if labels is None:
         print("[GỠ LỖI] Tiếp tục mà không có nhãn để gỡ lỗi")
 
-    # Khởi tạo nguồn video
     cap, temp_file_path, error_message = initialize_video_source(video_file)
     if error_message:
         return False, error_message
 
-    # Xử lý khung hình và nhận diện
     recognized, result_message = process_frame_and_recognize(
         cap, recognizer, username, action, st.empty(), video_file
     )
 
-    # Dọn dẹp
     cleanup_video(cap, video_file, temp_file_path, st.empty())
 
     return recognized, result_message
