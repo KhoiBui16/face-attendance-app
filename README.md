@@ -48,21 +48,26 @@ face-attendance-app/
 ├── app/
 │   ├── main.py
 │   ├── core/
+│   │   ├── __init__.py
 │   │   ├── data_collector/
+│   │   │   ├── __init__.py
 │   │   │   ├── face_data_collector.py
 │   │   │   ├── video_data_collector.py
 │   │   │   └── webcam_data_collector.py
 │   │   ├── face_detection/
+│   │   │   ├── __init__.py
 │   │   │   ├── detector.py
 │   │   │   └── recognizer.py
 │   │   ├── config.py
 │   │   ├── recognize_and_log.py
-│   │   └── train_model.py
+│   │   ├── train_model.py
 │   │   └── haarcascade_frontalface_default.xml
 │   ├── modules/
+│   │   ├── __init__.py
 │   │   ├── admin.py
 │   │   └── attendance.py
 │   ├── utils/
+│   │   ├── __init__.py
 │   │   ├── auth.py
 │   │   ├── helpers.py
 │   │   └── user_utils.py
