@@ -26,7 +26,7 @@
   {
     "username": "mbappe",
     "password": "1",
-    "is_allowed": false,
+    "is_allowed": true,
     "is_admin": false
   }
 ]
