@@ -4,7 +4,7 @@ import json
 import os
 from utils.user_utils import is_logged_in
 
-USERS_FILE = "../data/users.json"
+USERS_FILE = "app/data/users.json"
 
 
 def load_users():
