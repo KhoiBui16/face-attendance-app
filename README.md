@@ -3,17 +3,15 @@
 ---
 
 ## 📑 Table of Contents
-- [📷 Face Attendance App with Auth](#-face-attendance-app-with-auth)
-  - [📑 Table of Contents](#-table-of-contents)
-  - [📝 Project Description](#-project-description)
-  - [📁 Project Structure](#-project-structure)
-  - [🔐 Features](#-features)
-  - [🎥 Demo Video](#-demo-video)
-  - [📊 Sample Dataset](#-sample-dataset)
-  - [🚀 How to Run Locally](#-how-to-run-locally)
-  - [🔐 Note](#-note)
-  - [🛠 Tech Stack](#-tech-stack)
-  - [📬 Contact](#-contact)
+- [📝 Project Description](#-project-description)
+- [📁 Project Structure](#-project-structure)
+- [🔐 Features](#-features)
+- [🎥 Demo Video](#-demo-video)
+- [📊 Sample Dataset](#-sample-dataset)
+- [🚀 How to Run Locally](#-how-to-run-locally)
+- [🔐 Note](#-note)
+- [🛠 Tech Stack](#-tech-stack)
+- [📬 Contact](#-contact)
 
 ---
 
