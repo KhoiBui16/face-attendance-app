@@ -10,11 +10,6 @@
   - [🎥 Demo Video](#-demo-video)
   - [📊 Sample Dataset](#-sample-dataset)
   - [🚀 How to Run Locally](#-how-to-run-locally)
-    - [1. Clone the repository](#1-clone-the-repository)
-    - [2. Set up your environment](#2-set-up-your-environment)
-    - [3. Install dependencies](#3-install-dependencies)
-    - [4. Run the app](#4-run-the-app)
-  - [🔐 Note](#-note)
   - [🛠 Tech Stack](#-tech-stack)
   - [📬 Contact](#-contact)
 
@@ -190,14 +185,6 @@ After a few seconds, your browser should open at:
 ```bash
 http://localhost:8501
 ```
-
----
-
-## 🔐 Note
-
-> Do **not** push `users.json` or `data/` directory to GitHub.  
-> These contain sensitive user data and face datasets.  
-> Ensure `.gitignore` includes `users.json` and `data/` to prevent accidental commits.
 
 ---
 
