@@ -14,13 +14,13 @@ def validate_data(face_path, label_path):
             labels = pickle.load(f)
 
         if len(faces) != len(labels):
-            print(
-                f"[LỖI] Số lượng khuôn mặt ({len(faces)}) không khớp với nhãn ({len(labels)})"
-            )
+            # print(
+            #     f"[LỖI] Số lượng khuôn mặt ({len(faces)}) không khớp với nhãn ({len(labels)})"
+            # )
             return False
 
         if len(faces) == 0 or len(labels) == 0:
-            print("[LỖI] Dữ liệu khuôn mặt hoặc nhãn rỗng.")
+            # print("[LỖI] Dữ liệu khuôn mặt hoặc nhãn rỗng.")
             return False
 
         unique_labels = set(labels)
@@ -63,9 +63,9 @@ def train_model(
             stratify=recognizer.labels,
         )
 
-        print(
-            f"[GỠ LỖI] Tập huấn luyện: {len(X_train)} mẫu, Tập kiểm tra: {len(X_test)} mẫu"
-        )
+        # print(
+        #     f"[GỠ LỖI] Tập huấn luyện: {len(X_train)} mẫu, Tập kiểm tra: {len(X_test)} mẫu"
+        # )
 
         recognizer.model.fit(X_train, y_train)
 
@@ -73,7 +73,7 @@ def train_model(
             print(f"[LỖI] Mô hình {model_type} không có thuộc tính classes_")
             return False
         recognizer.classes_ = recognizer.model.classes_
-        print(f"[GỠ LỖI] Classes: {recognizer.classes_}")
+        # print(f"[GỠ LỖI] Classes: {recognizer.classes_}")
 
         train_predictions = recognizer.model.predict(X_train)
         train_accuracy = accuracy_score(y_train, train_predictions)
@@ -106,9 +106,9 @@ def train_model(
         recognizer.train()
 
         recognizer.save(save_path)
-        print(
-            f"[GỠ LỖI] Mô hình '{model_type}' đã được huấn luyện và lưu vào {save_path}"
-        )
+        # print(
+        #     f"[GỠ LỖI] Mô hình '{model_type}' đã được huấn luyện và lưu vào {save_path}"
+        # )
         return True
     except Exception as e:
         print(f"[LỖI] Lỗi khi huấn luyện mô hình: {e}")
