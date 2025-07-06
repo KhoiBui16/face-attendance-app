@@ -251,7 +251,7 @@ def process_frame_and_recognize(
         result_message = f"❌ Lỗi trong quá trình nhận diện: {e}"
         print(f"[LỖI] Ngoại lệ trong process_frame_and_recognize: {e}")
 
-    print(f"[GỠ LỖI] Tổng thời gian xử lý: {time.time() - start_time:.2f} giây")
+    # print(f"[GỠ LỖI] Tổng thời gian xử lý: {time.time() - start_time:.2f} giây")
     return recognized, result_message
 
 
@@ -274,7 +274,7 @@ def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
     try:
         if video_file is not None and temp_file_path and os.path.exists(temp_file_path):
             os.remove(temp_file_path)
-            print(f"Đã xóa file video tạm: {temp_file_path}")
+            # print(f"Đã xóa file video tạm: {temp_file_path}")
     except Exception as e:
         print(f"[LỖI] Lỗi khi xóa file tạm: {e}")
 
