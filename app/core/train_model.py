@@ -79,7 +79,7 @@ def train_model(
 
         train_predictions = recognizer.model.predict(X_train)
         train_accuracy = accuracy_score(y_train, train_predictions)
-        print(f"[THÔNG TIN] Độ chính xác trên tập train: {train_accuracy:.2f}")
+        # print(f"[THÔNG TIN] Độ chính xác trên tập train: {train_accuracy:.2f}")
 
         confidences = []
         predictions = []
@@ -90,16 +90,16 @@ def train_model(
 
         test_accuracy = accuracy_score(y_test, predictions)
         mean_confidence = np.mean(confidences)
-        print(f"[THÔNG TIN] Độ chính xác trên tập test: {test_accuracy:.2f}")
-        print(f"[THÔNG TIN] Confidence trung bình trên tập test: {mean_confidence:.2f}")
-        print(
-            f"[THÔNG TIN] Gợi ý ngưỡng confidence: {max(0.5, float(mean_confidence) - 0.1):.2f}"
-        )
+        # print(f"[THÔNG TIN] Độ chính xác trên tập test: {test_accuracy:.2f}")
+        # print(f"[THÔNG TIN] Confidence trung bình trên tập test: {mean_confidence:.2f}")
+        # print(
+        #     f"[THÔNG TIN] Gợi ý ngưỡng confidence: {max(0.5, float(mean_confidence) - 0.1):.2f}"
+        # )
 
-        if train_accuracy - test_accuracy > 0.15:
-            print(
-                "[CẢNH BÁO] Mô hình có dấu hiệu overfitting (chênh lệch độ chính xác train/test > 0.15)"
-            )
+        # if train_accuracy - test_accuracy > 0.15:
+        #     print(
+        #         "[CẢNH BÁO] Mô hình có dấu hiệu overfitting (chênh lệch độ chính xác train/test > 0.15)"
+        #     )
 
         if test_accuracy < 0.9:
             print("[LỖI] Độ chính xác trên tập test quá thấp. Không lưu mô hình.")

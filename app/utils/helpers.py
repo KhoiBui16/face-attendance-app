@@ -83,7 +83,7 @@ def read_all_attendance_csv():
                     print(f"[ERROR] Failed to read {file_path}: {e}")
 
         if not all_dfs:
-            print("[DEBUG] No attendance CSV files found")
+            # print("[DEBUG] No attendance CSV files found")
             return (
                 pd.DataFrame(
                     columns=[
@@ -122,7 +122,7 @@ def read_all_attendance_csv():
 def preprocess_attendance(df):
     """Preprocess attendance data for display."""
     if df.empty:
-        print(f"[DEBUG] DataFrame is empty in preprocess_attendance")
+        # print(f"[DEBUG] DataFrame is empty in preprocess_attendance")
         return pd.DataFrame(
             columns=[
                 "name",
