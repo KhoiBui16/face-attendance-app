@@ -134,6 +134,9 @@ Follow these steps to clone and run the app on your local machine.
 
 ```bash
 git clone https://github.com/KhoiBui16/face-attendance-app.git
+```
+
+```bash
 cd face-attendance-app
 ```
 
@@ -142,14 +145,20 @@ cd face-attendance-app
 **On Windows**:
   ```bash
   python -m venv venv
-  venv\Scripts\activate
-  ```
+```
+
+```bash
+venv\Scripts\activate
+```
 
 **On macOS/Linux**:
   ```bash
   python3 -m venv venv
-  source venv/bin/activate
-  ```
+```
+
+```bash
+source venv/bin/activate
+```
 
 ### 3. Install dependencies
 
@@ -177,6 +186,9 @@ Once everything is installed, run the following command to launch the app:
 
 ```bash
 cd app
+```
+
+```bash
 streamlit run main.py
 ```
 
