@@ -22,11 +22,11 @@ def load_users():
         return []
     except json.JSONDecodeError as e:
         st.error(f"Lỗi cú pháp trong file users.json: {e}")
-        print(f"[LỖI] Nội dung file users.json không hợp lệ: {e}")
+        # print(f"[LỖI] Nội dung file users.json không hợp lệ: {e}")
         return []
     except Exception as e:
         st.error(f"Lỗi khi đọc file users.json: {e}")
-        print(f"[LỖI] Lỗi khi đọc file users.json: {e}")
+        # print(f"[LỖI] Lỗi khi đọc file users.json: {e}")
         return []
 
 
