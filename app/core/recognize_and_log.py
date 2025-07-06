@@ -108,10 +108,10 @@ def initialize_video_source(video_file):
         cap.release()
         return None, temp_file_path, "❌ Không thể đọc khung hình từ webcam/video"
     height, width = frame.shape[:2]
-    if width < 640 or height < 480:
-        print(
-            f"[CẢNH BÁO] Độ phân giải thấp ({width}x{height}), có thể ảnh hưởng đến phát hiện khuôn mặt"
-        )
+    # if width < 640 or height < 480:
+    #     print(
+    #         f"[CẢNH BÁO] Độ phân giải thấp ({width}x{height}), có thể ảnh hưởng đến phát hiện khuôn mặt"
+    #     )
     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
     # print(
