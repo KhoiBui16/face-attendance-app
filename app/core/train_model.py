@@ -5,6 +5,7 @@ from core.face_detection.recognizer import FaceRecognizer
 from sklearn.model_selection import train_test_split
 from sklearn.metrics import accuracy_score
 
+
 def validate_data(face_path, label_path):
     """Kiểm tra dữ liệu khuôn mặt và nhãn có khớp nhau không."""
     try:
@@ -34,6 +35,7 @@ def validate_data(face_path, label_path):
     except Exception as e:
         print(f"[LỖI] Lỗi khi kiểm tra dữ liệu: {e}")
         return False
+
 
 def train_model(
     model_type="svm",
