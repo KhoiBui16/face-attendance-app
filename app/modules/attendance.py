@@ -47,9 +47,9 @@ def main():
     ):
         st.session_state.attendance_df = load_attendance_history(username=username)
         st.session_state.last_username = username
-        print(
-            f"[DEBUG] Refreshed attendance_df for {username}, shape={st.session_state.attendance_df.shape}"
-        )
+        # print(
+        #     f"[DEBUG] Refreshed attendance_df for {username}, shape={st.session_state.attendance_df.shape}"
+        # )
 
     # Khởi tạo session state cho result_message
     if "result_message" not in st.session_state:
