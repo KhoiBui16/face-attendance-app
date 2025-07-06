@@ -72,7 +72,7 @@ def load_labels():
         # print(f"[GỠ LỖI] Đã tải nhãn: {labels}")
         return labels
     except Exception as e:
-        # print(f"[LỖI] Lỗi khi tải names.pkl: {e}")
+        print(f"[LỖI] Lỗi khi tải names.pkl: {e}")
         return None
 
 
@@ -89,7 +89,7 @@ def initialize_video_source(video_file):
         for index in range(3):
             cap = cv2.VideoCapture(index)
             if cap.isOpened():
-                print(f"[LỖI] Webcam đã được mở với index {index}")
+                # print(f"[GỠ LỖI] Webcam đã được mở với index {index}")
                 break
             cap.release()
         if not cap or not cap.isOpened():
@@ -191,8 +191,8 @@ def process_frame_and_recognize(
                     if label == username:
                         if confidence >= 0.5:
                             if st.session_state.get("is_admin", False):
-                                result_message = f"[DEMO] Nhận diện: {username}"
-                                print(f"Chế độ demo admin: {username}")
+                                result_message = f"✅ [DEMO] Nhận diện: {username}"
+                                # print(f"[GỠ LỖI] Chế độ demo admin: {username}")
                                 recognized = True
                                 break
 

@@ -10,7 +10,7 @@ import albumentations as A
 
 def augment_image(image):
     if not isinstance(image, np.ndarray):
-        # print(f"[ERROR] Input image is not a NumPy array: {type(image)}")
+        print(f"[ERROR] Input image is not a NumPy array: {type(image)}")
         return []
 
     augmented_images = [image]
@@ -88,7 +88,6 @@ def collect_face_data(
     num_original_samples = (
         num_samples // 4
     )  # Mỗi mẫu gốc tạo 4 mẫu (gốc + 3 tăng cường)
-    print(f"\n[INFO] Bắt đầu thu thập dữ liệu cho '{name}'...")
 
     try:
         # Kiểm tra độ phân giải khung hình
@@ -177,24 +176,22 @@ def collect_face_data(
 
     try:
         if len(collected_faces) > 0 and collected_faces.shape[1] != expected_size:
-            print(
-                f"[ERROR] HOG size mismatch: {collected_faces.shape[1]} vs {expected_size}"
-            )
+            # print(
+            #     f"[ERROR] HOG size mismatch: {collected_faces.shape[1]} vs {expected_size}"
+            # )
             return False
         old_faces = np.array([]).reshape(0, expected_size)
         old_labels = []
-
         if os.path.exists(face_path):
             with open(face_path, "rb") as f:
                 old_faces = pickle.load(f)
             # print(f"[DEBUG] Old faces shape: {old_faces.shape}")
             if old_faces.shape[1] != expected_size:
-                print(
-                    f"[ERROR] Old faces size mismatch: {old_faces.shape[1]} vs {expected_size}"
-                )
-                print(f"[INFO] Please delete {face_path} and {label_path}")
+                # print(
+                #     f"[ERROR] Old faces size mismatch: {old_faces.shape[1]} vs {expected_size}"
+                # )
+                # print(f"[INFO] Please delete {face_path} and {label_path}")
                 return False
-
         if os.path.exists(label_path):
             with open(label_path, "rb") as f:
                 old_labels = pickle.load(f)
@@ -208,15 +205,14 @@ def collect_face_data(
 
         collected_labels = old_labels + collected_labels
         if collected_faces.shape[0] != len(collected_labels):
-            print(
-                f"[ERROR] Mismatch: faces={collected_faces.shape[0]}, labels={len(collected_labels)}"
-            )
+            # print(
+            #     f"[ERROR] Mismatch: faces={collected_faces.shape[0]}, labels={len(collected_labels)}"
+            # )
             return False
         with open(face_path, "wb") as f:
             pickle.dump(collected_faces, f)
         with open(label_path, "wb") as f:
             pickle.dump(collected_labels, f)
-        print(f"[SUCCESS] Đã lưu {len(collected_labels)} ảnh và nhãn.")
         return True
     except Exception as e:
         print(f"[ERROR] Failed to save dataset: {e}")

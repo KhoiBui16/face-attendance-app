@@ -6,6 +6,7 @@ from sklearn.neural_network import MLPClassifier
 from sklearn.ensemble import RandomForestClassifier, AdaBoostClassifier
 from sklearn.tree import DecisionTreeClassifier
 
+
 class FaceRecognizer:
     def __init__(self, model_type="svm"):
         """Khởi tạo lớp FaceRecognizer với loại mô hình được chỉ định."""
@@ -41,11 +42,13 @@ class FaceRecognizer:
     def train(self):
         """Huấn luyện mô hình với dữ liệu khuôn mặt và nhãn."""
         if self.faces is None or self.labels is None:
-            raise ValueError("Dữ liệu khuôn mặt hoặc nhãn chưa được tải. Hãy gọi load_data trước.")
+            raise ValueError(
+                "Dữ liệu khuôn mặt hoặc nhãn chưa được tải. Hãy gọi load_data trước."
+            )
         # print(f"[GỠ LỖI] Huấn luyện mô hình với {len(self.labels)} mẫu")
         self.model.fit(self.faces, self.labels)
         # Gán self.classes_ sau khi huấn luyện
-        if hasattr(self.model, 'classes_'):
+        if hasattr(self.model, "classes_"):
             self.classes_ = self.model.classes_
         else:
             self.classes_ = np.unique(self.labels)
@@ -61,31 +64,37 @@ class FaceRecognizer:
         try:
             # Kiểm tra xem self.classes_ đã được khởi tạo chưa
             if self.classes_ is None:
-                raise ValueError("self.classes_ chưa được khởi tạo. Hãy huấn luyện hoặc tải mô hình trước.")
-            
+                raise ValueError(
+                    "self.classes_ chưa được khởi tạo. Hãy huấn luyện hoặc tải mô hình trước."
+                )
+
             face = np.array(face).reshape(1, -1)  # Đảm bảo định dạng đúng
             probas = self.model.predict_proba(face)[0]  # Lấy xác suất dự đoán
             max_index = probas.argmax()  # Chỉ số của xác suất cao nhất
             confidence = probas[max_index]  # Độ tin cậy
             predicted_label = self.classes_[max_index]  # Nhãn dự đoán
-            
-            # In thông tin
+
+            # In thông tin gỡ lỗi
             # print(f"[THÔNG TIN] Xác suất cho mỗi nhãn: {dict(zip(self.classes_, probas))}")
             # print(f"[THÔNG TIN] Nhãn dự đoán: {predicted_label}, độ tin cậy: {confidence}")
-            
+
             return predicted_label, float(confidence)
         except Exception as e:
-            # print(f"[LỖI] Lỗi trong predict_with_confidence: {e}")
+            print(f"[LỖI] Lỗi trong predict_with_confidence: {e}")
             return None, 0.0
 
     def save(self, path):
         """Lưu mô hình học máy và classes_ vào file."""
         try:
             if self.classes_ is None:
-                raise ValueError("self.classes_ chưa được khởi tạo. Không thể lưu mô hình.")
+                raise ValueError(
+                    "self.classes_ chưa được khởi tạo. Không thể lưu mô hình."
+                )
             with open(path, "wb") as f:
-                pickle.dump({'model': self.model, 'classes_': self.classes_}, f)  # Lưu từ điển
-            print(f"[THÀNH CÔNG] Mô hình đã được lưu vào {path}")
+                pickle.dump(
+                    {"model": self.model, "classes_": self.classes_}, f
+                )  # Lưu từ điển
+            # print(f"[THÀNH CÔNG] Mô hình đã được lưu vào {path}")
         except Exception as e:
             print(f"[LỖI] Lỗi khi lưu mô hình: {e}")
             raise
@@ -97,10 +106,16 @@ class FaceRecognizer:
             recognizer = FaceRecognizer(model_type=model_type)
             with open(path, "rb") as f:
                 data = pickle.load(f)
-                if not isinstance(data, dict) or 'model' not in data or 'classes_' not in data:
-                    raise ValueError("Tệp mô hình không đúng định dạng: cần chứa 'model' và 'classes_'")
-                recognizer.model = data['model']
-                recognizer.classes_ = data['classes_']
+                if (
+                    not isinstance(data, dict)
+                    or "model" not in data
+                    or "classes_" not in data
+                ):
+                    raise ValueError(
+                        "Tệp mô hình không đúng định dạng: cần chứa 'model' và 'classes_'"
+                    )
+                recognizer.model = data["model"]
+                recognizer.classes_ = data["classes_"]
             # print(f"[THÀNH CÔNG] Mô hình đã được tải từ {path}")
             # print(f"[GỠ LỖI] Đã tải classes: {recognizer.classes_}")
             return recognizer

@@ -8,15 +8,25 @@ from utils.helpers import load_attendance_history, display_message
 
 
 def main():
+    # Kiểm tra xem đã vào trang điểm danh lần đầu chưa
+    if "attendance_page_entered" not in st.session_state:
+        st.session_state.attendance_page_entered = False
+
+    # In thông báo chỉ khi vào trang điểm danh lần đầu
+    if not st.session_state.attendance_page_entered:
+        print("[TRANG ĐIỂM DANH] Đã vào trang điểm danh...")
+        st.session_state.attendance_page_entered = True
+
     # Sidebar
     if is_logged_in():
         st.sidebar.title("Điều hướng")
         st.sidebar.text(f"👤 Tài khoản: {st.session_state.get('username', 'N/A')}")
         st.sidebar.text(
-            f"🔐Quyền: {'Admin' if st.session_state.get('is_admin', False) else 'Người dùng'}"
+            f"🔐 Quyền: {'Admin' if st.session_state.get('is_admin', False) else 'Người dùng'}"
         )
         if st.sidebar.button("Đăng xuất"):
             logout()
+            st.session_state.attendance_page_entered = False  # Reset khi đăng xuất
             st.rerun()
 
     st.title("Trang điểm danh")
@@ -24,6 +34,7 @@ def main():
     # Kiểm tra đăng nhập
     if not is_logged_in():
         st.warning("Vui lòng đăng nhập để sử dụng trang điểm danh.")
+        st.session_state.attendance_page_entered = False  # Reset khi không đăng nhập
         st.stop()
 
     # Kiểm tra mô hình
@@ -47,15 +58,14 @@ def main():
     ):
         st.session_state.attendance_df = load_attendance_history(username=username)
         st.session_state.last_username = username
-        # print(
-        #     f"[DEBUG] Refreshed attendance_df for {username}, shape={st.session_state.attendance_df.shape}"
-        # )
 
-    # Khởi tạo session state cho result_message
+    # Khởi tạo session state cho result_message và action
     if "result_message" not in st.session_state:
         st.session_state.result_message = None
     if "last_action" not in st.session_state:
         st.session_state.last_action = None
+    if "action_trigger" not in st.session_state:
+        st.session_state.action_trigger = 0
 
     # Hiển thị lịch sử điểm danh của user
     st.subheader(f"Lịch sử điểm danh của {username}")
@@ -74,7 +84,7 @@ def main():
 
     if input_source == "Tải video":
         video_file = st.file_uploader(
-            "Tải lên video khuôn mặt (mp4, avi)", type=["mp4", "avi"]
+            "Tải lên video khuôn mặt (mp Powers4, avi)", type=["mp4", "avi"]
         )
     elif input_source == "URL":
         video_url = st.text_input(
@@ -93,174 +103,188 @@ def main():
     def handle_check_in(input_source, video_file, video_url, username):
         """
         Xử lý hành động check-in.
-        - input_source: "Webcam", "Tải video", hoặc "URL"
-        - video_file: File video upload (nếu có)
-        - video_url: URL video (nếu có)
-        - username: Tên người dùng
         """
-        temp_video_path = None
-        if input_source == "Tải video" and video_file is None:
-            st.session_state.result_message = (
-                "❌ Vui lòng tải lên video trước khi check-in."
-            )
-            st.session_state.last_action = "check-in"
-            display_message(st.session_state.result_message, is_success=False)
-        elif input_source == "URL" and not video_url:
-            st.session_state.result_message = (
-                "❌ Vui lòng nhập URL video trước khi check-in."
-            )
-            st.session_state.last_action = "check-in"
-            display_message(st.session_state.result_message, is_success=False)
-        else:
-            with st.spinner("Đang nhận diện..."):
-                try:
-                    if input_source == "URL":
-                        try:
-                            # Download video from URL
-                            response = requests.get(video_url, stream=True)
-                            if response.status_code != 200:
-                                st.session_state.result_message = f"❌ Lỗi khi tải video từ URL: HTTP {response.status_code}"
-                                st.session_state.last_action = "check-in"
+        current_action = f"check-in_{input_source}_{st.session_state.action_trigger}"
+        if st.session_state.last_action != current_action:
+            # In thông báo khi người dùng thực hiện check-in
+            print(f"[USER] thực hiện [CHECK-IN]...")
+            temp_video_path = None
+            if input_source == "Tải video" and video_file is None:
+                st.session_state.result_message = (
+                    "❌ Vui lòng tải lên video trước khi check-in."
+                )
+                st.session_state.last_action = current_action
+                display_message(st.session_state.result_message, is_success=False)
+            elif input_source == "URL" and not video_url:
+                st.session_state.result_message = (
+                    "❌ Vui lòng nhập URL video trước khi check-in."
+                )
+                st.session_state.last_action = current_action
+                display_message(st.session_state.result_message, is_success=False)
+            else:
+                with st.spinner("Đang nhận diện..."):
+                    try:
+                        if input_source == "URL":
+                            try:
+                                response = requests.get(
+                                    video_url, stream=True, timeout=30
+                                )
+                                if response.status_code != 200:
+                                    st.session_state.result_message = f"❌ Lỗi khi tải video từ URL: HTTP {response.status_code}"
+                                    st.session_state.last_action = current_action
+                                    display_message(
+                                        st.session_state.result_message,
+                                        is_success=False,
+                                    )
+                                    return
+                                content_type = response.headers.get("content-type", "")
+                                if not (
+                                    content_type.startswith("video/")
+                                    or content_type == "application/octet-stream"
+                                ):
+                                    st.session_state.result_message = f"❌ URL không phải video trực tiếp (Content-Type: {content_type})."
+                                    st.session_state.last_action = current_action
+                                    display_message(
+                                        st.session_state.result_message,
+                                        is_success=False,
+                                    )
+                                    return
+                                temp_video_path = (
+                                    f"data/temp/{username}_temp_checkin.mp4"
+                                )
+                                os.makedirs(
+                                    os.path.dirname(temp_video_path), exist_ok=True
+                                )
+                                with open(temp_video_path, "wb") as f:
+                                    for chunk in response.iter_content(chunk_size=8192):
+                                        if chunk:
+                                            f.write(chunk)
+                                video_file = temp_video_path
+                            except Exception as e:
+                                st.session_state.result_message = (
+                                    f"❌ Lỗi khi tải video từ URL: {e}"
+                                )
+                                st.session_state.last_action = current_action
                                 display_message(
                                     st.session_state.result_message, is_success=False
                                 )
                                 return
-                            # Check if content type is video
-                            content_type = response.headers.get("content-type", "")
-                            if not (
-                                content_type.startswith("video/")
-                                or content_type == "application/octet-stream"
-                            ):
-                                st.session_state.result_message = f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
-                                st.session_state.last_action = "check-in"
-                                display_message(
-                                    st.session_state.result_message, is_success=False
-                                )
-                                return
-                            # Save video temporarily
-                            temp_video_path = f"data/temp/{username}_temp_checkin.mp4"
-                            os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
-                            with open(temp_video_path, "wb") as f:
-                                for chunk in response.iter_content(chunk_size=8192):
-                                    if chunk:
-                                        f.write(chunk)
-                            video_file = temp_video_path
-                        except Exception as e:
-                            st.session_state.result_message = (
-                                f"❌ Lỗi khi tải video từ URL: {e}"
-                            )
-                            st.session_state.last_action = "check-in"
-                            display_message(
-                                st.session_state.result_message, is_success=False
-                            )
-                            return
 
-                    success, message = recognize_and_log(
-                        action="check-in",
-                        video_file=(
-                            video_file if input_source in ["Tải video", "URL"] else None
-                        ),
-                    )
-                    st.session_state.result_message = message
-                    st.session_state.last_action = "check-in"
-                    display_message(message=message, is_success=success)
-                    if success:
-                        st.session_state.attendance_df = load_attendance_history(
-                            username=username
+                        success, message = recognize_and_log(
+                            action="check-in",
+                            video_file=(
+                                video_file
+                                if input_source in ["Tải video", "URL"]
+                                else None
+                            ),
                         )
-                        st.session_state.result_message = None
-                        st.session_state.last_action = None
-                        st.rerun()
-                finally:
-                    # Clean up temporary video file if created
-                    if temp_video_path and os.path.exists(temp_video_path):
-                        os.remove(temp_video_path)
+                        st.session_state.result_message = message
+                        st.session_state.last_action = current_action
+                        display_message(message=message, is_success=success)
+                        if success:
+                            st.session_state.attendance_df = load_attendance_history(
+                                username=username
+                            )
+                            st.session_state.result_message = None
+                            st.session_state.last_action = None
+                            st.session_state.action_trigger += 1
+                            st.rerun()
+                    finally:
+                        if temp_video_path and os.path.exists(temp_video_path):
+                            os.remove(temp_video_path)
 
     def handle_check_out(input_source, video_file, video_url, username):
         """
         Xử lý hành động check-out.
-        - input_source: "Webcam", "Tải video", hoặc "URL"
-        - video_file: File video upload (nếu có)
-        - video_url: URL video (nếu có)
-        - username: Tên người dùng
         """
-        temp_video_path = None
-        if input_source == "Tải video" and video_file is None:
-            st.session_state.result_message = (
-                "❌ Vui lòng tải lên video trước khi check-out."
-            )
-            st.session_state.last_action = "check-out"
-            display_message(st.session_state.result_message, is_success=False)
-        elif input_source == "URL" and not video_url:
-            st.session_state.result_message = (
-                "❌ Vui lòng nhập URL video trước khi check-out."
-            )
-            st.session_state.last_action = "check-out"
-            display_message(st.session_state.result_message, is_success=False)
-        else:
-            with st.spinner("Đang nhận diện..."):
-                try:
-                    if input_source == "URL":
-                        try:
-                            # Download video from URL
-                            response = requests.get(video_url, stream=True)
-                            if response.status_code != 200:
-                                st.session_state.result_message = f"❌ Lỗi khi tải video từ URL: HTTP {response.status_code}"
-                                st.session_state.last_action = "check-out"
+        current_action = f"check-out_{input_source}_{st.session_state.action_trigger}"
+        if st.session_state.last_action != current_action:
+            # In thông báo khi người dùng thực hiện check-out
+            print(f"[USER] thực hiện [CHECK-OUT]...")
+            temp_video_path = None
+            if input_source == "Tải video" and video_file is None:
+                st.session_state.result_message = (
+                    "❌ Vui lòng tải lên video trước khi check-out."
+                )
+                st.session_state.last_action = current_action
+                display_message(st.session_state.result_message, is_success=False)
+            elif input_source == "URL" and not video_url:
+                st.session_state.result_message = (
+                    "❌ Vui lòng nhập URL video trước khi check-out."
+                )
+                st.session_state.last_action = current_action
+                display_message(st.session_state.result_message, is_success=False)
+            else:
+                with st.spinner("Đang nhận diện..."):
+                    try:
+                        if input_source == "URL":
+                            try:
+                                response = requests.get(
+                                    video_url, stream=True, timeout=30
+                                )
+                                if response.status_code != 200:
+                                    st.session_state.result_message = f"❌ Lỗi khi tải video từ URL: HTTP {response.status_code}"
+                                    st.session_state.last_action = current_action
+                                    display_message(
+                                        st.session_state.result_message,
+                                        is_success=False,
+                                    )
+                                    return
+                                content_type = response.headers.get("content-type", "")
+                                if not (
+                                    content_type.startswith("video/")
+                                    or content_type == "application/octet-stream"
+                                ):
+                                    st.session_state.result_message = f"❌ URL không phải video trực tiếp (Content-Type: {content_type})."
+                                    st.session_state.last_action = current_action
+                                    display_message(
+                                        st.session_state.result_message,
+                                        is_success=False,
+                                    )
+                                    return
+                                temp_video_path = (
+                                    f"data/temp/{username}_temp_checkout.mp4"
+                                )
+                                os.makedirs(
+                                    os.path.dirname(temp_video_path), exist_ok=True
+                                )
+                                with open(temp_video_path, "wb") as f:
+                                    for chunk in response.iter_content(chunk_size=8192):
+                                        if chunk:
+                                            f.write(chunk)
+                                video_file = temp_video_path
+                            except Exception as e:
+                                st.session_state.result_message = (
+                                    f"❌ Lỗi khi tải video từ URL: {e}"
+                                )
+                                st.session_state.last_action = current_action
                                 display_message(
                                     st.session_state.result_message, is_success=False
                                 )
                                 return
-                            # Check if content type is video
-                            content_type = response.headers.get("content-type", "")
-                            if not (
-                                content_type.startswith("video/")
-                                or content_type == "application/octet-stream"
-                            ):
-                                st.session_state.result_message = f"❌ URL không phải video trực tiếp (Content‑Type: {content_type})."
-                                st.session_state.last_action = "check-out"
-                                display_message(
-                                    st.session_state.result_message, is_success=False
-                                )
-                                return
-                            # Save video temporarily
-                            temp_video_path = f"data/temp/{username}_temp_checkout.mp4"
-                            os.makedirs(os.path.dirname(temp_video_path), exist_ok=True)
-                            with open(temp_video_path, "wb") as f:
-                                for chunk in response.iter_content(chunk_size=8192):
-                                    if chunk:
-                                        f.write(chunk)
-                            video_file = temp_video_path
-                        except Exception as e:
-                            st.session_state.result_message = (
-                                f"❌ Lỗi khi tải video từ URL: {e}"
-                            )
-                            st.session_state.last_action = "check-out"
-                            display_message(
-                                st.session_state.result_message, is_success=False
-                            )
-                            return
 
-                    success, message = recognize_and_log(
-                        action="check-out",
-                        video_file=(
-                            video_file if input_source in ["Tải video", "URL"] else None
-                        ),
-                    )
-                    st.session_state.result_message = message
-                    st.session_state.last_action = "check-out"
-                    display_message(message=message, is_success=success)
-                    if success:
-                        st.session_state.attendance_df = load_attendance_history(
-                            username=username
+                        success, message = recognize_and_log(
+                            action="check-out",
+                            video_file=(
+                                video_file
+                                if input_source in ["Tải video", "URL"]
+                                else None
+                            ),
                         )
-                        st.session_state.result_message = None
-                        st.session_state.last_action = None
-                        st.rerun()
-                finally:
-                    # Clean up temporary video file if created
-                    if temp_video_path and os.path.exists(temp_video_path):
-                        os.remove(temp_video_path)
+                        st.session_state.result_message = message
+                        st.session_state.last_action = current_action
+                        display_message(message=message, is_success=success)
+                        if success:
+                            st.session_state.attendance_df = load_attendance_history(
+                                username=username
+                            )
+                            st.session_state.result_message = None
+                            st.session_state.last_action = None
+                            st.session_state.action_trigger += 1
+                            st.rerun()
+                    finally:
+                        if temp_video_path and os.path.exists(temp_video_path):
+                            os.remove(temp_video_path)
 
     with col1:
         if st.button("Check-in"):
@@ -285,7 +309,8 @@ def main():
         if st.session_state.result_message.startswith("✅"):
             pass  # Bỏ hiển thị lặp vì đã hiển thị trong Check-in/Check-out
         elif (
-            st.session_state.last_action == "check-in"
+            st.session_state.last_action is not None
+            and st.session_state.last_action.startswith("check-in")
             and st.session_state.result_message
             == "❌ Khuôn mặt không xác định (unknown)"
         ):
@@ -293,6 +318,7 @@ def main():
             if st.button("Thử lại"):
                 st.session_state.result_message = None
                 st.session_state.last_action = None
+                st.session_state.action_trigger += 1
                 if input_source == "Tải video":
                     st.file_uploader(
                         "Tải lên video khuôn mặt (mp4, avi)",

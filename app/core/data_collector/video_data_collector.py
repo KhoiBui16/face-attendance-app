@@ -3,6 +3,7 @@ import os
 import streamlit as st
 from .face_data_collector import collect_face_data
 
+
 def collect_data_from_uploaded_video(
     video_path, name, save_dir="data/dataset", num_samples=100
 ):
