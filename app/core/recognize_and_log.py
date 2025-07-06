@@ -167,7 +167,7 @@ def process_frame_and_recognize(
                 try:
                     name, confidence = recognizer.predict_with_confidence(hog_features)
                     print(
-                        f"\n[NHẬN DIỆN]: name={name}, confidence={confidence}, username={username}"
+                        f"\n[NHẬN DIỆN]: name={name}, confidence={confidence:.4f}, username={username}"
                     )
 
                     label = name if name == username else "unknown"
