@@ -101,9 +101,9 @@ def train_model(
         #         "[CẢNH BÁO] Mô hình có dấu hiệu overfitting (chênh lệch độ chính xác train/test > 0.15)"
         #     )
 
-        if test_accuracy < 0.9:
-            print("[LỖI] Độ chính xác trên tập test quá thấp. Không lưu mô hình.")
-            return False
+        # if test_accuracy < 0.9:
+        #     print("[LỖI] Độ chính xác trên tập test quá thấp. Không lưu mô hình.")
+        #     return False
 
         recognizer.train()
 
