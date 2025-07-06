@@ -70,8 +70,8 @@ class FaceRecognizer:
             predicted_label = self.classes_[max_index]  # Nhãn dự đoán
             
             # In thông tin
-            print(f"[THÔNG TIN] Xác suất cho mỗi nhãn: {dict(zip(self.classes_, probas))}")
-            print(f"[THÔNG TIN] Nhãn dự đoán: {predicted_label}, độ tin cậy: {confidence}")
+            # print(f"[THÔNG TIN] Xác suất cho mỗi nhãn: {dict(zip(self.classes_, probas))}")
+            # print(f"[THÔNG TIN] Nhãn dự đoán: {predicted_label}, độ tin cậy: {confidence}")
             
             return predicted_label, float(confidence)
         except Exception as e:
