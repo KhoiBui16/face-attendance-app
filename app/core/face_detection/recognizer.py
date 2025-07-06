@@ -101,7 +101,7 @@ class FaceRecognizer:
                     raise ValueError("Tệp mô hình không đúng định dạng: cần chứa 'model' và 'classes_'")
                 recognizer.model = data['model']
                 recognizer.classes_ = data['classes_']
-            print(f"[THÀNH CÔNG] Mô hình đã được tải từ {path}")
+            # print(f"[THÀNH CÔNG] Mô hình đã được tải từ {path}")
             # print(f"[GỠ LỖI] Đã tải classes: {recognizer.classes_}")
             return recognizer
         except Exception as e:
