@@ -6,13 +6,13 @@
     "is_allowed": true
   },
   {
-    "username": "ronaldo",
+    "username": "pele",
     "password": "1",
     "is_allowed": true,
     "is_admin": false
   },
   {
-    "username": "pele",
+    "username": "ronaldo",
     "password": "1",
     "is_allowed": true,
     "is_admin": false

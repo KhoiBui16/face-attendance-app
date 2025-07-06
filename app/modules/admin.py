@@ -1,4 +1,5 @@
 import pickle
+from datetime import datetime
 import streamlit as st
 import requests
 import os
@@ -97,10 +98,11 @@ def _collect_and_train(name: str, upload_option: str, uploaded_video, video_url)
             with open("data/dataset/names.pkl", "rb") as f:
                 labels = pickle.load(f)
 
-            if st.session_state.get("logged_collect_success") != name:
-                print(f"[SUCCESS] Đã lưu {len(labels)} ảnh và nhãn.")
-                print(f"[SUCCESS] Thu thập & huấn luyện thành công cho {name}")
-                st.session_state.logged_collect_success = name
+            print(f"[SUCCESS] Đã lưu {len(labels)} ảnh và nhãn.")
+            print(
+                f"[SUCCESS] Huấn luyện xong {name} @ {datetime.now().strftime('%H:%M:%S')}"
+            )
+            st.session_state.logged_collect_success = name
 
             if len(set(labels)) >= 2:
                 with st.spinner("Huấn luyện model…"):
