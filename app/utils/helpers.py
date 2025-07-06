@@ -28,7 +28,7 @@ def read_attendance_csv(username=None):
                 ]
             )
             df.to_csv(log_file, index=False)
-            print(f"[DEBUG] Created new attendance CSV: {log_file}")
+            # print(f"[DEBUG] Created new attendance CSV: {log_file}")
             return df
 
         df = pd.read_csv(log_file)
@@ -39,9 +39,9 @@ def read_attendance_csv(username=None):
         df["time-check-out"] = pd.to_datetime(
             df["time-check-out"], format="%Y-%m-%d %H:%M:%S", errors="coerce"
         )
-        print(
-            f"[DEBUG] Loaded attendance CSV: {log_file}, shape={df.shape}, columns={df.columns.tolist()}"
-        )
+        # print(
+        #     f"[DEBUG] Loaded attendance CSV: {log_file}, shape={df.shape}, columns={df.columns.tolist()}"
+        # )
         return df
 
     except Exception as e:
@@ -76,9 +76,9 @@ def read_all_attendance_csv():
                     if not df.empty:
                         df = df.assign(username=username)
                         all_dfs.append(df)
-                    print(
-                        f"[DEBUG] Loaded attendance CSV for {username}: {file_path}, shape={df.shape}"
-                    )
+                    # print(
+                    #     f"[DEBUG] Loaded attendance CSV for {username}: {file_path}, shape={df.shape}"
+                    # )
                 except Exception as e:
                     print(f"[ERROR] Failed to read {file_path}: {e}")
 
@@ -99,7 +99,7 @@ def read_all_attendance_csv():
             )
 
         combined_df = pd.concat(all_dfs, ignore_index=True)
-        print(f"[DEBUG] Combined attendance CSV, shape={combined_df.shape}")
+        # print(f"[DEBUG] Combined attendance CSV, shape={combined_df.shape}")
         return combined_df, user_files
 
     except Exception as e:
@@ -153,14 +153,14 @@ def append_attendance_log(name, image, position, action):
     if image is not None:
         try:
             cv2.imwrite(image_path, image)
-            print(f"[DEBUG] Saved image to {image_path}")
+            # print(f"[DEBUG] Saved image to {image_path}")
         except Exception as e:
             print(f"[ERROR] Failed to save image {image_path}: {e}")
 
     df = read_attendance_csv(username=name)
-    print(
-        f"[DEBUG] Before append, DataFrame shape: {df.shape}, action={action}, name={name}"
-    )
+    # print(
+    #     f"[DEBUG] Before append, DataFrame shape: {df.shape}, action={action}, name={name}"
+    # )
 
     if action == "check-in":
         mask = (
@@ -169,7 +169,7 @@ def append_attendance_log(name, image, position, action):
             & (df["time-check-in"].notna())
         )
         if mask.any():
-            print(f"[DEBUG] Check-in already exists for {name} on {date}")
+            # print(f"[DEBUG] Check-in already exists for {name} on {date}")
             return False, f"{name} đã check-in hôm nay rồi."
 
         new_record = pd.DataFrame(
@@ -194,7 +194,7 @@ def append_attendance_log(name, image, position, action):
             & (df["time-check-in"].notna())
             & (df["time-check-out"].isna())
         )
-        print(f"[DEBUG] Check-out mask: {mask.sum()} rows matched")
+        # print(f"[DEBUG] Check-out mask: {mask.sum()} rows matched")
 
         if mask.any():
             df.loc[mask, "time-check-out"] = timestamp
@@ -210,56 +210,56 @@ def append_attendance_log(name, image, position, action):
                 axis=1,
             )
         else:
-            print(f"[DEBUG] No matching check-in record for {name} on {date}")
+            # print(f"[DEBUG] No matching check-in record for {name} on {date}")
             return False, f"Không tìm thấy bản ghi check-in cho ngày hôm nay."
 
     try:
         if os.path.exists(log_file):
             if not os.access(log_file, os.W_OK):
-                print(f"[ERROR] No write permission for {log_file}")
+                # print(f"[ERROR] No write permission for {log_file}")
                 return False, f"Không có quyền ghi vào file {log_file}"
 
         df.to_csv(log_file, index=False)
-        print(
-            f"[DEBUG] Saved attendance log to {log_file}, new shape={df.shape}, data=\n{df.tail(1)}"
-        )
+        # print(
+        #     f"[DEBUG] Saved attendance log to {log_file}, new shape={df.shape}, data=\n{df.tail(1)}"
+        # )
         return True, f"Điểm danh {action} thành công cho {name}"
     except Exception as e:
-        print(f"[ERROR] Failed to save attendance log: {e}")
+        # print(f"[ERROR] Failed to save attendance log: {e}")
         return False, f"Lỗi khi lưu log điểm danh: {e}"
 
 
 def is_action_allowed(name: str, action: str) -> tuple[bool, str]:
     """Kiểm tra xem hành động check-in/check-out có được phép thực hiện không."""
     username = st.session_state.get("username", name)
-    print(
-        f"[DEBUG] is_action_allowed: input_name={name}, username={username}, action={action}"
-    )
+    # print(
+    #     f"[DEBUG] is_action_allowed: input_name={name}, username={username}, action={action}"
+    # )
 
     df = read_attendance_csv(username=username)
     if df.empty:
         if action == "check-in":
             return True, ""
         else:
-            print(f"[DEBUG] Empty DataFrame, cannot check-out for {username}")
+            # print(f"[DEBUG] Empty DataFrame, cannot check-out for {username}")
             return False, f"{username} chưa check-in nên không thể check-out."
 
     today = datetime.now().date()
     df_today = df[(df["name"] == username) & (df["date"].dt.date == today)]
-    print(f"[DEBUG] df_today rows: {df_today.shape[0]} for {username} on {today}")
+    # print(f"[DEBUG] df_today rows: {df_today.shape[0]} for {username} on {today}")
 
     if action == "check-in":
         if not df_today.empty and df_today["time-check-in"].notna().any():
-            print(f"[DEBUG] {username} already checked in today")
+            # print(f"[DEBUG] {username} already checked in today")
             return False, f"{username} đã check-in hôm nay rồi."
         else:
             return True, ""
     elif action == "check-out":
         if df_today.empty or not df_today["time-check-in"].notna().any():
-            print(f"[DEBUG] No check-in found for {username} today")
+            # print(f"[DEBUG] No check-in found for {username} today")
             return False, f"{username} chưa check-in nên không thể check-out."
         elif df_today["time-check-out"].notna().any():
-            print(f"[DEBUG] {username} already checked out today")
+            # print(f"[DEBUG] {username} already checked out today")
             return False, f"{username} đã check-out hôm nay rồi."
         else:
             return True, ""
@@ -270,16 +270,16 @@ def has_trained_data(username):
     """Kiểm tra xem username có dữ liệu khuôn mặt trong names.pkl hay không."""
     label_path = "data/dataset/names.pkl"
     if not os.path.exists(label_path):
-        print(f"[DEBUG] File {label_path} không tồn tại.")
+        # print(f"[DEBUG] File {label_path} không tồn tại.")
         return False
     try:
         with open(label_path, "rb") as f:
             labels = pickle.load(f)
         has_data = username in labels
-        print(f"[DEBUG] Kiểm tra dữ liệu khuôn mặt cho {username}: {has_data}")
+        # print(f"[DEBUG] Kiểm tra dữ liệu khuôn mặt cho {username}: {has_data}")
         return has_data
     except Exception as e:
-        print(f"[ERROR] Lỗi khi đọc {label_path}: {e}")
+        # print(f"[ERROR] Lỗi khi đọc {label_path}: {e}")
         return False
 
 
@@ -316,9 +316,9 @@ def load_attendance_history(username):
             )
             try:
                 df.to_csv(attendance_path, index=False)
-                print(
-                    f"[DEBUG] Created new attendance CSV for {username}: {attendance_path}"
-                )
+                # print(
+                #     f"[DEBUG] Created new attendance CSV for {username}: {attendance_path}"
+                # )
             except Exception as e:
                 print(f"[ERROR] Failed to create CSV {attendance_path}: {e}")
                 return pd.DataFrame(
@@ -351,9 +351,9 @@ def load_attendance_history(username):
                 "position",
             ]
         ]
-        print(
-            f"[DEBUG] Loaded attendance history for {username}, shape={df_user.shape}, data={df_user.to_dict()}"
-        )
+        # print(
+        #     f"[DEBUG] Loaded attendance history for {username}, shape={df_user.shape}, data={df_user.to_dict()}"
+        # )
         return df_user
 
     except Exception as e:
@@ -387,7 +387,7 @@ def save_uploaded_video(
         with open(save_path, "wb") as f:
             f.write(video_file.read())
 
-        print(f"[DEBUG] Đã lưu video tại {save_path}")
+        # print(f"[DEBUG] Đã lưu video tại {save_path}")
         return save_path
     except Exception as e:
         print(f"[ERROR] Lỗi khi lưu video: {e}")
@@ -403,6 +403,6 @@ def display_message(message, is_success=True, placeholder=None, duration=1):
     else:
         st.error(message)
     time.sleep(duration)
-    print(
-        f"[DEBUG] Displayed message: {message}, success={is_success}, duration={duration}"
-    )
+    # `print(
+    #     f"[DEBUG] Displayed message: {message}, success={is_success}, duration={duration}"
+    # )`
