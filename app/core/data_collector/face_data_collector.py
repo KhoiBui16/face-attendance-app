@@ -17,8 +17,8 @@ def augment_image(image):
 
     transforms = [
         A.HorizontalFlip(p=1.0),
-        A.ColorJitter(brightness=(1.2, 1.2), p=1.0),  # Tăng độ sáng
-        A.ColorJitter(brightness=(0.8, 0.8), p=1.0),  # Giảm độ sáng
+        A.ColorJitter(brightness=(1.2, 1.2), p=1.0),
+        A.ColorJitter(brightness=(0.8, 0.8), p=1.0),
     ]
 
     for transform in transforms:
@@ -32,26 +32,15 @@ def augment_image(image):
 
 
 def extract_hog_features(roi, size=(100, 100)):
-    """
-    Trích xuất đặc trưng HOG từ vùng ảnh (ROI).
-    - roi: Vùng ảnh chứa khuôn mặt (BGR).
-    - size: Kích thước resize ảnh (mặc định 100x100).
-    - Trả về: Đặc trưng HOG dạng vector.
-    """
-
     if roi.shape[0] < 10 or roi.shape[1] < 10:
-        # print(f"[ERROR] ROI quá nhỏ: {roi.shape}")
         return None
     try:
-
         resized = cv2.resize(roi, size)
         gray = cv2.cvtColor(resized, cv2.COLOR_BGR2GRAY)
         features, _ = hog(
             gray, pixels_per_cell=(8, 8), cells_per_block=(2, 2), visualize=True
         )
-        # print(f"[DEBUG] HOG features shape: {features.shape}")
         if features.shape[0] != HOG_CONFIG["expected_hog_size"]:
-            # print(f"[ERROR] Kích thước HOG ({features.shape[0]}) không khớp với kỳ vọng ({HOG_CONFIG['expected_hog_size']})")
             return None
         return features
     except Exception as e:
@@ -60,17 +49,13 @@ def extract_hog_features(roi, size=(100, 100)):
 
 
 def is_good_quality(frame, x, y, w, h):
-    """Kiểm tra chất lượng ảnh khuôn mặt dựa trên độ sáng và độ nét."""
     roi = frame[y : y + h, x : x + w]
     if roi.shape[0] < 10 or roi.shape[1] < 10:
-        # print(f"[ERROR] ROI quá nhỏ: {roi.shape}")
         return False
-
     try:
         gray = cv2.cvtColor(roi, cv2.COLOR_BGR2GRAY)
         brightness = gray.mean()
         sharpness = cv2.Laplacian(gray, cv2.CV_64F).var()
-        # print(f"[DEBUG] Brightness: {brightness}, Sharpness: {sharpness}")
         return brightness > 50 and sharpness > 100
     except Exception as e:
         print(f"[ERROR] Lỗi khi kiểm tra chất lượng: {e}")
@@ -84,36 +69,25 @@ def collect_face_data(
 
     collected_faces = []
     collected_labels = []
-    original_count = 0  # Đếm số khuôn mặt gốc thu thập
-    num_original_samples = (
-        num_samples // 4
-    )  # Mỗi mẫu gốc tạo 4 mẫu (gốc + 3 tăng cường)
+    original_count = 0
+    num_original_samples = num_samples // 4
 
     try:
-        # Kiểm tra độ phân giải khung hình
         ret, frame = cap.read()
         if not ret:
             print("[ERROR] Không thể đọc khung hình từ webcam/video")
             return False
         height, width = frame.shape[:2]
-        # if width < 640 or height < 480:
-        #     print(
-        #         f"[WARNING] Độ phân giải thấp ({width}x{height}), có thể ảnh hưởng đến phát hiện khuôn mặt"
-        #     )
-        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Reset về khung hình đầu tiên
+        cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
         while cap.isOpened() and len(collected_faces) < num_samples:
             ret, frame = cap.read()
             if not ret:
-                # print("[DEBUG] Failed to read frame.")
                 break
 
             faces = detect_faces(frame)
-            # print(f"[DEBUG] Detected {len(faces)} faces")
 
             for x, y, w, h in faces:
-                # print(f"[DEBUG] Face ROI: x={x}, y={y}, w={w}, h={h}")
-
                 if is_good_quality(frame, x, y, w, h):
                     roi = frame[y : y + h, x : x + w]
                     augmented_images = augment_image(roi)
@@ -122,14 +96,11 @@ def collect_face_data(
                         if hog_features is not None:
                             collected_faces.append(hog_features)
                             collected_labels.append(name)
-                            # print(f"[DEBUG] Collected face {len(collected_faces)}/{num_samples}")
 
-                    original_count += 1  # Tăng đếm khuôn mặt gốc
-                    # print(f"[DEBUG] Original faces collected: {original_count}/{num_original_samples}")
+                    original_count += 1
                     if len(collected_faces) >= num_samples:
                         break
                 else:
-                    # print("[DEBUG] Skipping low-quality face")
                     if display_callback:
                         cv2.putText(
                             frame,
@@ -167,8 +138,6 @@ def collect_face_data(
         return False
 
     collected_faces = np.array(collected_faces)
-    # print(f"[DEBUG] Collected faces shape: {collected_faces.shape}")
-    # print(f"[DEBUG] Collected labels length: {len(collected_labels)}")
 
     face_path = os.path.join(save_dir, "faces.pkl")
     label_path = os.path.join(save_dir, "names.pkl")
@@ -176,26 +145,17 @@ def collect_face_data(
 
     try:
         if len(collected_faces) > 0 and collected_faces.shape[1] != expected_size:
-            # print(
-            #     f"[ERROR] HOG size mismatch: {collected_faces.shape[1]} vs {expected_size}"
-            # )
             return False
         old_faces = np.array([]).reshape(0, expected_size)
         old_labels = []
         if os.path.exists(face_path):
             with open(face_path, "rb") as f:
                 old_faces = pickle.load(f)
-            # print(f"[DEBUG] Old faces shape: {old_faces.shape}")
             if old_faces.shape[1] != expected_size:
-                # print(
-                #     f"[ERROR] Old faces size mismatch: {old_faces.shape[1]} vs {expected_size}"
-                # )
-                # print(f"[INFO] Please delete {face_path} and {label_path}")
                 return False
         if os.path.exists(label_path):
             with open(label_path, "rb") as f:
                 old_labels = pickle.load(f)
-            # print(f"[INFO] Existing labels: {set(old_labels)}")
 
         collected_faces = (
             np.vstack([old_faces, collected_faces])
@@ -205,14 +165,13 @@ def collect_face_data(
 
         collected_labels = old_labels + collected_labels
         if collected_faces.shape[0] != len(collected_labels):
-            # print(
-            #     f"[ERROR] Mismatch: faces={collected_faces.shape[0]}, labels={len(collected_labels)}"
-            # )
             return False
         with open(face_path, "wb") as f:
             pickle.dump(collected_faces, f)
         with open(label_path, "wb") as f:
             pickle.dump(collected_labels, f)
+
+        print(f"[SUCCESS] Đã lưu {len(collected_labels)} ảnh và nhãn.")
         return True
     except Exception as e:
         print(f"[ERROR] Failed to save dataset: {e}")

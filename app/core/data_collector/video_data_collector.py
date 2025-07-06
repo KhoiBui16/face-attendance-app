@@ -1,7 +1,30 @@
 import cv2
 import os
 import streamlit as st
+import imageio.v3 as iio
 from .face_data_collector import collect_face_data
+
+
+class ImageioWrapper:
+    """Giả lập API tối thiểu như cv2.VideoCapture bằng imageio (RGB → BGR)."""
+    def __init__(self, path):
+        self.reader = iio.imiter(path)
+        self._opened = True
+
+    def isOpened(self):
+        return self._opened
+
+    def read(self):
+        try:
+            frame = next(self.reader)  # imageio trả về RGB
+            frame_bgr = cv2.cvtColor(frame, cv2.COLOR_RGB2BGR)
+            return True, frame_bgr
+        except StopIteration:
+            return False, None
+
+    def release(self):
+        self._opened = False
+        self.reader.close()
 
 
 def collect_data_from_uploaded_video(
@@ -21,14 +44,17 @@ def collect_data_from_uploaded_video(
 
     cap = cv2.VideoCapture(video_path)
     if not cap.isOpened():
-        st.error("❌ Không thể đọc file video.")
-        # print(f"[ERROR] Failed to open video: {video_path}")
-        return False
+        st.warning("⚠️ OpenCV không mở được video, thử dùng imageio…")
+        try:
+            cap = ImageioWrapper(video_path)
+        except Exception:
+            st.error("❌ Không thể đọc file video.")
+            return False
 
-    # Kiểm tra thông tin video
-    fps = cap.get(cv2.CAP_PROP_FPS)
-    frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-    # print(f"[DEBUG] Video info: FPS={fps}, Total frames={frame_count}")
+    if isinstance(cap, cv2.VideoCapture):
+        fps = cap.get(cv2.CAP_PROP_FPS)
+        frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
+        # print(f"[DEBUG] Video info: FPS={fps}, Total frames={frame_count}")
 
     progress = st.progress(0)
     display = st.empty()
@@ -61,6 +87,7 @@ def collect_data_from_uploaded_video(
         print(f"[ERROR] Lỗi khi thu thập dữ liệu từ video: {e}")
         return False
     finally:
-        cap.release()
+        if hasattr(cap, "release"):
+            cap.release()
         display.empty()
         progress.empty()

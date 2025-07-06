@@ -9,3 +9,4 @@ joblib
 matplotlib
 imageio
 watchdog
+imageio[ffmpeg]
