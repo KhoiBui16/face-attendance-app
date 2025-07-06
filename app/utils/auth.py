@@ -4,7 +4,7 @@ import json
 import os
 from utils.user_utils import is_logged_in
 
-USERS_FILE = "app/data/users.json"
+USERS_FILE = "data/users.json"
 
 
 def load_users():
@@ -97,11 +97,11 @@ def login_page():
 
     if is_logged_in():
         if st.button("Quay lại trang điểm danh"):
-            if os.path.exists("pages/attendance.py"):
-                st.switch_page("pages/attendance.py")
+            if os.path.exists("modules/attendance.py"):
+                st.switch_page("modules/attendance.py")
             else:
                 st.error(
-                    "Không tìm thấy trang điểm danh. Kiểm tra file `pages/attendance.py`."
+                    "Không tìm thấy trang điểm danh. Kiểm tra file `modules/attendance.py`."
                 )
 
 
