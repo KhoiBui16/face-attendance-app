@@ -16,9 +16,9 @@ def load_users():
                 if not isinstance(data, list):
                     st.error("File users.json phải chứa một mảng danh sách người dùng.")
                     return []
-                print(f"[DEBUG] Đã tải {len(data)} người dùng từ {USERS_FILE}")
+                # print(f"[DEBUG] Đã tải {len(data)} người dùng từ {USERS_FILE}")
                 return data
-        print(f"[DEBUG] File {USERS_FILE} không tồn tại, trả về danh sách rỗng.")
+        # print(f"[DEBUG] File {USERS_FILE} không tồn tại, trả về danh sách rỗng.")
         return []
     except json.JSONDecodeError as e:
         st.error(f"Lỗi cú pháp trong file users.json: {e}")
@@ -36,10 +36,10 @@ def save_users(users):
         os.makedirs(os.path.dirname(USERS_FILE), exist_ok=True)
         with open(USERS_FILE, "w", encoding="utf-8") as f:
             json.dump(users, f, indent=2, ensure_ascii=False)
-        print(f"[DEBUG] Đã lưu danh sách người dùng vào {USERS_FILE}")
+        # print(f"[DEBUG] Đã lưu danh sách người dùng vào {USERS_FILE}")
     except Exception as e:
         st.error(f"Lỗi khi lưu file users.json: {e}")
-        print(f"[LỖI] Lỗi khi lưu file users.json: {e}")
+        # print(f"[LỖI] Lỗi khi lưu file users.json: {e}")
 
 
 def ensure_admin_user():
@@ -55,7 +55,7 @@ def ensure_admin_user():
             }
         )
         save_users(users)
-        print("[DEBUG] Tài khoản admin mặc định đã được tạo.")
+        # print("[DEBUG] Tài khoản admin mặc định đã được tạo.")
         st.info("Tài khoản admin mặc định đã được tạo.")
 
 
@@ -86,9 +86,9 @@ def login_page():
         st.session_state.is_admin = user.get("is_admin", False)
         st.session_state.is_allowed = user.get("is_allowed", False)
         st.session_state.just_logged_in = True
-        print(
-            f"[DEBUG] Đăng nhập thành công: username={username}, is_admin={st.session_state.is_admin}, is_allowed={st.session_state.is_allowed}"
-        )
+        # print(
+        #     f"[DEBUG] Đăng nhập thành công: username={username}, is_admin={st.session_state.is_admin}, is_allowed={st.session_state.is_allowed}"
+        # )
         st.rerun()
 
     if st.button("Đăng ký"):
@@ -152,5 +152,5 @@ def logout():
         "page",
     ]:
         st.session_state.pop(key, None)
-    print("[DEBUG] Đã đăng xuất người dùng.")
+    # print("[DEBUG] Đã đăng xuất người dùng.")
     st.rerun()
