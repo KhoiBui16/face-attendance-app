@@ -118,9 +118,9 @@ face-attendance-app/
 
 ## 📊 Sample Dataset
 
-- [Link to sample dataset train](https://github.com/KhoiBui16/face-attendance-app/tree/main/data/train)
-- [Link to sample dataset test](https://github.com/KhoiBui16/face-attendance-app/tree/main/data/test)
-- [Link to user's accounts and passwords demo](https://github.com/KhoiBui16/face-attendance-app/blob/main/data/users.json)
+- [Link to sample dataset train](https://github.com/KhoiBui16/face-attendance-app/tree/main/image/train)
+- [Link to sample dataset test](https://github.com/KhoiBui16/face-attendance-app/tree/main/image/test)
+- [Link to user's accounts and passwords demo](https://github.com/KhoiBui16/face-attendance-app/blob/main/app/data/users.json)
 
 The sample dataset contains video files and face data for testing or training the recognition model.
 
