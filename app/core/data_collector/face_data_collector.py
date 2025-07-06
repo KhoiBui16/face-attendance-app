@@ -88,7 +88,7 @@ def collect_face_data(
     num_original_samples = (
         num_samples // 4
     )  # Mỗi mẫu gốc tạo 4 mẫu (gốc + 3 tăng cường)
-    print(f"[INFO] Bắt đầu thu thập dữ liệu cho '{name}'...")
+    print(f"\n[INFO] Bắt đầu thu thập dữ liệu cho '{name}'...")
 
     try:
         # Kiểm tra độ phân giải khung hình
@@ -183,7 +183,7 @@ def collect_face_data(
             return False
         old_faces = np.array([]).reshape(0, expected_size)
         old_labels = []
-        
+
         if os.path.exists(face_path):
             with open(face_path, "rb") as f:
                 old_faces = pickle.load(f)
@@ -194,18 +194,18 @@ def collect_face_data(
                 )
                 print(f"[INFO] Please delete {face_path} and {label_path}")
                 return False
-            
+
         if os.path.exists(label_path):
             with open(label_path, "rb") as f:
                 old_labels = pickle.load(f)
             # print(f"[INFO] Existing labels: {set(old_labels)}")
-        
+
         collected_faces = (
             np.vstack([old_faces, collected_faces])
             if old_faces.size
             else collected_faces
         )
-        
+
         collected_labels = old_labels + collected_labels
         if collected_faces.shape[0] != len(collected_labels):
             print(

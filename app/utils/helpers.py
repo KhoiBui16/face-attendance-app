@@ -225,7 +225,7 @@ def append_attendance_log(name, image, position, action):
         # )
         return True, f"Điểm danh {action} thành công cho {name}"
     except Exception as e:
-        # print(f"[ERROR] Failed to save attendance log: {e}")
+        print(f"[ERROR] Failed to save attendance log: {e}")
         return False, f"Lỗi khi lưu log điểm danh: {e}"
 
 
