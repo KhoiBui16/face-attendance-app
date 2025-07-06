@@ -6,10 +6,16 @@ import tempfile
 import streamlit as st
 from core.face_detection.detector import detect_faces
 from core.data_collector.face_data_collector import extract_hog_features
-from utils.helpers import append_attendance_log, is_action_allowed, has_trained_data, display_message
+from utils.helpers import (
+    append_attendance_log,
+    is_action_allowed,
+    has_trained_data,
+    display_message,
+)
 from utils.user_utils import is_logged_in
 from core.data_collector.face_data_collector import is_good_quality
 from core.face_detection.recognizer import FaceRecognizer
+
 
 def check_prerequisites(username, model_type="svm"):
     """
@@ -22,7 +28,7 @@ def check_prerequisites(username, model_type="svm"):
     if not username:
         return False, "❌ Không tìm thấy username trong phiên đăng nhập.", None
 
-    print(f"[GỠ LỖI] Username từ phiên: {username}")
+    # print(f"[GỠ LỖI] Username từ phiên: {username}")
 
     if not has_trained_data(username):
         return (
@@ -38,20 +44,21 @@ def check_prerequisites(username, model_type="svm"):
     try:
         recognizer = FaceRecognizer.load(model_path, model_type=model_type)
         if not hasattr(recognizer, "predict_with_confidence"):
-            print("[LỖI] recognizer không có phương thức predict_with_confidence")
+            # print("[LỖI] recognizer không có phương thức predict_with_confidence")
             return (
                 False,
                 "❌ Mô hình không hợp lệ: thiếu phương thức predict_with_confidence",
                 None,
             )
         if recognizer.classes_ is None:
-            print("[LỖI] Mô hình đã tải không có thuộc tính classes_")
+            # print("[LỖI] Mô hình đã tải không có thuộc tính classes_")
             return False, "❌ Mô hình không chứa thông tin classes_", None
-        print(f"[GỠ LỖI] Đã tải classes: {recognizer.classes_}")
+        # print(f"[GỠ LỖI] Đã tải classes: {recognizer.classes_}")
         return True, "", recognizer
     except Exception as e:
-        print(f"[LỖI] Lỗi tải mô hình: {e}")
+        # print(f"[LỖI] Lỗi tải mô hình: {e}")
         return False, f"❌ Lỗi tải mô hình: {e}", None
+
 
 def load_labels():
     """
@@ -62,11 +69,12 @@ def load_labels():
     try:
         with open(names_path, "rb") as f:
             labels = pickle.load(f)
-        print(f"[GỠ LỖI] Đã tải nhãn: {labels}")
+        # print(f"[GỠ LỖI] Đã tải nhãn: {labels}")
         return labels
     except Exception as e:
-        print(f"[LỖI] Lỗi khi tải names.pkl: {e}")
+        # print(f"[LỖI] Lỗi khi tải names.pkl: {e}")
         return None
+
 
 def initialize_video_source(video_file):
     """
@@ -81,7 +89,7 @@ def initialize_video_source(video_file):
         for index in range(3):
             cap = cv2.VideoCapture(index)
             if cap.isOpened():
-                print(f"[GỠ LỖI] Webcam đã được mở với index {index}")
+                print(f"[LỖI] Webcam đã được mở với index {index}")
                 break
             cap.release()
         if not cap or not cap.isOpened():
@@ -106,10 +114,11 @@ def initialize_video_source(video_file):
         )
     cap.set(cv2.CAP_PROP_POS_FRAMES, 0)
 
-    print(
-        f"[GỠ LỖI] Thời gian khởi tạo nguồn video: {time.time() - start_time:.2f} giây"
-    )
+    # print(
+    #     f"[GỠ LỖI] Thời gian khởi tạo nguồn video: {time.time() - start_time:.2f} giây"
+    # )
     return cap, temp_file_path, None
+
 
 def process_frame_and_recognize(
     cap, recognizer, username, action, video_placeholder, video_file
@@ -129,9 +138,9 @@ def process_frame_and_recognize(
             ret, frame = cap.read()
             if not ret:
                 result_message = "❌ Không lấy được khung hình."
-                print(
-                    f"[GỠ LỖI] Không đọc được khung hình từ {'video' if video_file else 'webcam'}"
-                )
+                # print(
+                #     f"[GỠ LỖI] Không đọc được khung hình từ {'video' if video_file else 'webcam'}"
+                # )
                 break
 
             frame_rgb = cv2.cvtColor(frame, cv2.COLOR_BGR2RGB)
@@ -141,9 +150,9 @@ def process_frame_and_recognize(
 
             frame_start_time = time.time()
             faces = detect_faces(frame)
-            print(f"[GỠ LỖI] Số lượng khuôn mặt được phát hiện: {len(faces)}")
+            # print(f"[GỠ LỖI] Số lượng khuôn mặt được phát hiện: {len(faces)}")
             if len(faces) == 0:
-                print("[GỠ LỖI] Không phát hiện khuôn mặt trong khung hình")
+                # print("[GỠ LỖI] Không phát hiện khuôn mặt trong khung hình")
                 attempt += 1
                 continue
 
@@ -151,14 +160,14 @@ def process_frame_and_recognize(
                 roi = frame[y : y + h, x : x + w]
                 hog_features = extract_hog_features(roi, size=(100, 100))
                 if hog_features is None:
-                    print("[GỠ LỖI] Không thể trích xuất HOG features")
+                    # print("[GỠ LỖI] Không thể trích xuất HOG features")
                     attempt += 1
                     continue
 
                 try:
                     name, confidence = recognizer.predict_with_confidence(hog_features)
                     print(
-                        f"[GỠ LỖI] Nhận diện: name={name}, confidence={confidence}, username={username}"
+                        f"Nhận diện: name={name}, confidence={confidence}, username={username}"
                     )
 
                     label = name if name == username else "unknown"
@@ -182,17 +191,17 @@ def process_frame_and_recognize(
                     if label == username:
                         if confidence >= 0.5:
                             if st.session_state.get("is_admin", False):
-                                result_message = f"✅ [DEMO] Nhận diện: {username}"
-                                print(f"[GỠ LỖI] Chế độ demo admin: {username}")
+                                result_message = f"[DEMO] Nhận diện: {username}"
+                                print(f"Chế độ demo admin: {username}")
                                 recognized = True
                                 break
 
                             is_allowed, check_msg = is_action_allowed(username, action)
                             if not is_allowed:
                                 result_message = check_msg
-                                print(
-                                    f"[GỠ LỖI] is_action_allowed trả về False: {check_msg}"
-                                )
+                                # print(
+                                #     f"[GỠ LỖI] is_action_allowed trả về False: {check_msg}"
+                                # )
                                 recognized = True
                                 break
                             else:
@@ -200,16 +209,16 @@ def process_frame_and_recognize(
                                     username, roi, "attendance", action
                                 )
                                 result_message = f"✅ {msg}" if success else f"❌ {msg}"
-                                print(
-                                    f"[GỠ LỖI] Kết quả append_attendance_log: success={success}, message={msg}"
-                                )
+                                # print(
+                                #     f"[GỠ LỖI] Kết quả append_attendance_log: success={success}, message={msg}"
+                                # )
                                 recognized = True
                                 break
                         else:
                             result_message = (
                                 "❌ Độ tin cậy thấp. Vui lòng check-in lại."
                             )
-                            print(f"[GỠ LỖI] Confidence {confidence} dưới ngưỡng 0.5")
+                            print(f"Confidence = {confidence} dưới ngưỡng 0.5")
                             recognized = True
                             display_message(
                                 result_message,
@@ -220,13 +229,13 @@ def process_frame_and_recognize(
                     else:
                         result_message = "❌ Khuôn mặt không xác định (unknown)"
                         print(
-                            f"[GỠ LỖI] Bỏ qua khuôn mặt: label={label}, không khớp với username={username}"
+                            f"Bỏ qua khuôn mặt: label={label}, không khớp với username={username}"
                         )
                         recognized = True
                         break
 
                 except Exception as e:
-                    print(f"[GỠ LỖI] Lỗi nhận diện: {e}")
+                    print(f"[LỖI] Lỗi nhận diện: {e}")
                     result_message = f"❌ Lỗi nhận diện: {e}"
                     attempt += 1
                     continue
@@ -244,6 +253,7 @@ def process_frame_and_recognize(
 
     print(f"[GỠ LỖI] Tổng thời gian xử lý: {time.time() - start_time:.2f} giây")
     return recognized, result_message
+
 
 def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
     """
@@ -264,9 +274,10 @@ def cleanup_video(cap, video_file, temp_file_path, video_placeholder):
     try:
         if video_file is not None and temp_file_path and os.path.exists(temp_file_path):
             os.remove(temp_file_path)
-            print(f"[GỠ LỖI] Đã xóa file video tạm: {temp_file_path}")
+            print(f"Đã xóa file video tạm: {temp_file_path}")
     except Exception as e:
         print(f"[LỖI] Lỗi khi xóa file tạm: {e}")
+
 
 def recognize_and_log(action="check-in", video_file=None):
     """
@@ -283,7 +294,7 @@ def recognize_and_log(action="check-in", video_file=None):
 
     labels = load_labels()
     if labels is None:
-        print("[GỠ LỖI] Tiếp tục mà không có nhãn để gỡ lỗi")
+        print("[LỖI] Tiếp tục mà không có nhãn để gỡ lỗi")
 
     cap, temp_file_path, error_message = initialize_video_source(video_file)
     if error_message:
