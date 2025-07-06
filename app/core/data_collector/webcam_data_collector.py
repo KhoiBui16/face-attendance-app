@@ -16,7 +16,7 @@ def collect_data_from_webcam(name, save_dir="data/dataset", num_samples=10, came
         print(f"[ERROR] Failed to open webcam with index {camera_index}")
         return False
 
-    print(f"[DEBUG] Webcam opened with index {camera_index}")
+    # print(f"[DEBUG] Webcam opened with index {camera_index}")
     progress = st.progress(0)
     display = st.empty()
 
