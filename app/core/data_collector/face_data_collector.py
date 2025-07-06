@@ -97,10 +97,10 @@ def collect_face_data(
             print("[ERROR] Không thể đọc khung hình từ webcam/video")
             return False
         height, width = frame.shape[:2]
-        if width < 640 or height < 480:
-            print(
-                f"[WARNING] Độ phân giải thấp ({width}x{height}), có thể ảnh hưởng đến phát hiện khuôn mặt"
-            )
+        # if width < 640 or height < 480:
+        #     print(
+        #         f"[WARNING] Độ phân giải thấp ({width}x{height}), có thể ảnh hưởng đến phát hiện khuôn mặt"
+        #     )
         cap.set(cv2.CAP_PROP_POS_FRAMES, 0)  # Reset về khung hình đầu tiên
 
         while cap.isOpened() and len(collected_faces) < num_samples:
