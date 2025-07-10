@@ -6,7 +6,6 @@ from .face_data_collector import collect_face_data
 
 
 class ImageioWrapper:
-    """Giả lập API tối thiểu như cv2.VideoCapture bằng imageio (RGB → BGR)."""
     def __init__(self, path):
         self.reader = iio.imiter(path)
         self._opened = True
@@ -39,7 +38,6 @@ def collect_data_from_uploaded_video(
     """
     if not os.path.exists(video_path):
         st.error(f"❌ Video không tồn tại tại: {video_path}")
-        # print(f"[ERROR] Video file does not exist: {video_path}")
         return False
 
     cap = cv2.VideoCapture(video_path)
@@ -54,7 +52,6 @@ def collect_data_from_uploaded_video(
     if isinstance(cap, cv2.VideoCapture):
         fps = cap.get(cv2.CAP_PROP_FPS)
         frame_count = int(cap.get(cv2.CAP_PROP_FRAME_COUNT))
-        # print(f"[DEBUG] Video info: FPS={fps}, Total frames={frame_count}")
 
     progress = st.progress(0)
     display = st.empty()
@@ -73,6 +70,7 @@ def collect_data_from_uploaded_video(
 
     try:
         result = collect_face_data(cap, name, save_dir, num_samples, display_callback)
+        
         if result:
             st.success(f"✅ Thu thập thành công {num_samples} mẫu cho {name}")
             print(f"[SUCCESS] Thu thập thành công cho {name}")
@@ -81,6 +79,7 @@ def collect_data_from_uploaded_video(
                 f"❌ Không thu thập được dữ liệu cho {name}. Vui lòng kiểm tra video (đảm bảo có khuôn mặt rõ ràng, ánh sáng tốt)."
             )
             print(f"[ERROR] Thu thập thất bại cho {name}")
+            
         return result
     except Exception as e:
         st.error(f"❌ Lỗi khi thu thập dữ liệu từ video: {e}")

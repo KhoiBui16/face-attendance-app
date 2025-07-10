@@ -13,6 +13,7 @@ def collect_data_from_webcam(
     - num_samples: Số lượng mẫu thu thập.
     - camera_index: Chỉ số webcam.
     """
+    
     cap = cv2.VideoCapture(camera_index)
     if not cap.isOpened():
         st.error(f"❌ Không mở được webcam với index {camera_index}.")
@@ -38,13 +39,11 @@ def collect_data_from_webcam(
         result = collect_face_data(cap, name, save_dir, num_samples, display_callback)
         if result:
             st.success(f"✅ Thu thập thành công {num_samples} mẫu cho {name}")
-            # print(f"[SUCCESS] Thu thập thành công cho {name}")
         else:
-            st.error(
-                f"❌ Không thu thập được dữ liệu cho {name}. Vui lòng kiểm tra webcam."
-            )
-            # print(f"[ERROR] Thu thập thất bại cho {name}")
+            st.error(f"❌ Không thu thập được dữ liệu cho {name}. Vui lòng kiểm tra webcam.")
+            print(f"[ERROR] Thu thập thất bại cho {name}")
         return result
+    
     except Exception as e:
         st.error(f"❌ Lỗi khi thu thập dữ liệu: {e}")
         print(f"[ERROR] Lỗi khi thu thập dữ liệu từ webcam: {e}")

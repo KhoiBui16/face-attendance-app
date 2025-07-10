@@ -27,23 +27,15 @@ def main():
 
     current_page = st.session_state.page
     current_login_state = is_logged_in()
-    current_user_role = (
-        "admin" if is_admin() else "user" if current_login_state else None
-    )
+    current_user_role = ("admin" if is_admin() else "user" if current_login_state else None)
+    
     last_page = st.session_state.last_page
     last_login_state = st.session_state.last_login_state
     last_user_role = st.session_state.last_user_role
 
     current_state_key = f"{current_page}_{current_login_state}_{current_user_role}"
-    if (
-        current_page != last_page
-        or current_login_state != last_login_state
-        or current_user_role != last_user_role
-    ):
-        if (
-            st.session_state.last_printed_state != current_state_key
-            and time.time() - st.session_state.last_print_time > 1
-        ):
+    if (current_page != last_page or current_login_state != last_login_state or current_user_role != last_user_role):
+        if (st.session_state.last_printed_state != current_state_key and time.time() - st.session_state.last_print_time > 1):
             if not current_login_state:
                 if current_page == "register":
                     print("\n[TRANG ĐĂNG KÝ]...")

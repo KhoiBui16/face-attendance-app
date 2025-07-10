@@ -15,34 +15,24 @@ def validate_data(face_path, label_path):
             labels = pickle.load(f)
 
         if len(faces) != len(labels):
-            # print(
-            #     f"[LỖI] Số lượng khuôn mặt ({len(faces)}) không khớp với nhãn ({len(labels)})"
-            # )
             return False
 
         if len(faces) == 0 or len(labels) == 0:
-            # print("[LỖI] Dữ liệu khuôn mặt hoặc nhãn rỗng.")
             return False
 
         unique_labels = set(labels)
         print(f"[THÔNG TIN] Tìm thấy {len(unique_labels)} nhãn: {unique_labels}")
         if len(unique_labels) < 2:
-            print(
-                f"[THÔNG TIN] Cần ≥2 nhãn để huấn luyện. Dữ liệu đã lưu, chờ thêm nhãn."
-            )
+            print(f"[THÔNG TIN] Cần ≥2 nhãn để huấn luyện. Dữ liệu đã lưu, chờ thêm nhãn.")
             return False
         return True
+    
     except Exception as e:
         print(f"[LỖI] Lỗi khi kiểm tra dữ liệu: {e}")
         return False
 
 
-def train_model(
-    model_type="svm",
-    face_path="data/dataset/faces.pkl",
-    label_path="data/dataset/names.pkl",
-    save_path="data/models/model.pkl",
-):
+def train_model(model_type="svm", face_path="data/dataset/faces.pkl", label_path="data/dataset/names.pkl", save_path="data/models/model.pkl"):
     """Huấn luyện mô hình và lưu vào file."""
     os.makedirs(os.path.dirname(save_path), exist_ok=True)
 
@@ -57,17 +47,7 @@ def train_model(
         recognizer = FaceRecognizer(model_type=model_type)
         recognizer.load_data(face_path, label_path)
 
-        X_train, X_test, y_train, y_test = train_test_split(
-            recognizer.faces,
-            recognizer.labels,
-            test_size=0.3,
-            random_state=42,
-            stratify=recognizer.labels,
-        )
-
-        # print(
-        #     f"[GỠ LỖI] Tập huấn luyện: {len(X_train)} mẫu, Tập kiểm tra: {len(X_test)} mẫu"
-        # )
+        X_train, X_test, y_train, y_test = train_test_split(recognizer.faces, recognizer.labels, test_size=0.3, random_state=42, stratify=recognizer.labels)
 
         recognizer.model.fit(X_train, y_train)
 
@@ -75,11 +55,6 @@ def train_model(
             print(f"[LỖI] Mô hình {model_type} không có thuộc tính classes_")
             return False
         recognizer.classes_ = recognizer.model.classes_
-        # print(f"[GỠ LỖI] Classes: {recognizer.classes_}")
-
-        train_predictions = recognizer.model.predict(X_train)
-        train_accuracy = accuracy_score(y_train, train_predictions)
-        # print(f"[THÔNG TIN] Độ chính xác trên tập train: {train_accuracy:.2f}")
 
         confidences = []
         predictions = []
@@ -88,29 +63,9 @@ def train_model(
             predictions.append(pred)
             confidences.append(conf)
 
-        test_accuracy = accuracy_score(y_test, predictions)
-        mean_confidence = np.mean(confidences)
-        # print(f"[THÔNG TIN] Độ chính xác trên tập test: {test_accuracy:.2f}")
-        # print(f"[THÔNG TIN] Confidence trung bình trên tập test: {mean_confidence:.2f}")
-        # print(
-        #     f"[THÔNG TIN] Gợi ý ngưỡng confidence: {max(0.5, float(mean_confidence) - 0.1):.2f}"
-        # )
-
-        # if train_accuracy - test_accuracy > 0.15:
-        #     print(
-        #         "[CẢNH BÁO] Mô hình có dấu hiệu overfitting (chênh lệch độ chính xác train/test > 0.15)"
-        #     )
-
-        # if test_accuracy < 0.9:
-        #     print("[LỖI] Độ chính xác trên tập test quá thấp. Không lưu mô hình.")
-        #     return False
-
         recognizer.train()
-
         recognizer.save(save_path)
-        # print(
-        #     f"[GỠ LỖI] Mô hình '{model_type}' đã được huấn luyện và lưu vào {save_path}"
-        # )
+
         return True
     except Exception as e:
         print(f"[LỖI] Lỗi khi huấn luyện mô hình: {e}")
