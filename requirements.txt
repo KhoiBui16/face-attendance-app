@@ -1,5 +1,12 @@
-streamlit>=1.39.0
-opencv-python>=4.10.0
-numpy>=2.1.1
-pandas>=2.2.3
-scikit-learn>=1.5.2
+streamlit
+opencv-python-headless
+scikit-learn
+albumentations
+scikit-image
+numpy
+pandas
+joblib
+matplotlib
+watchdog
+imageio
+imageio-ffmpeg

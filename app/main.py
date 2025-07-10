@@ -1,19 +1,66 @@
 import streamlit as st
-import os
-from utils.auth import login_page, register_page, logout
+import time
+from utils.auth import login_page, register_page
 from utils.user_utils import is_logged_in, is_admin
+from modules.admin import main as admin_main
+from modules.attendance import main as attendance_main
+
 
 def main():
-    st.set_page_config(page_title="📷 Face Attendance App", layout="centered")
+    st.set_page_config(page_title="📷 Ứng dụng điểm danh khuôn mặt", layout="centered")
 
     if "page" not in st.session_state:
         st.session_state.page = "login"
 
-    # Debug trạng thái
-    # st.write(f"[DEBUG] Trạng thái: logged_in={st.session_state.get('logged_in', False)}, "
-            #  f"username={st.session_state.get('username', 'N/A')}, "
-            #  f"is_admin={st.session_state.get('is_admin', False)}, "
-            #  f"is_allowed={st.session_state.get('is_allowed', False)}")
+    if "last_page" not in st.session_state:
+        st.session_state.last_page = None
+    if "last_login_state" not in st.session_state:
+        st.session_state.last_login_state = None
+    if "last_user_role" not in st.session_state:
+        st.session_state.last_user_role = None
+    if "last_action_trigger" not in st.session_state:
+        st.session_state.last_action_trigger = 0
+    if "last_printed_state" not in st.session_state:
+        st.session_state.last_printed_state = None
+    if "last_print_time" not in st.session_state:
+        st.session_state.last_print_time = 0
+
+    current_page = st.session_state.page
+    current_login_state = is_logged_in()
+    current_user_role = (
+        "admin" if is_admin() else "user" if current_login_state else None
+    )
+    last_page = st.session_state.last_page
+    last_login_state = st.session_state.last_login_state
+    last_user_role = st.session_state.last_user_role
+
+    current_state_key = f"{current_page}_{current_login_state}_{current_user_role}"
+    if (
+        current_page != last_page
+        or current_login_state != last_login_state
+        or current_user_role != last_user_role
+    ):
+        if (
+            st.session_state.last_printed_state != current_state_key
+            and time.time() - st.session_state.last_print_time > 1
+        ):
+            if not current_login_state:
+                if current_page == "register":
+                    print("\n[TRANG ĐĂNG KÝ]...")
+                else:
+                    print("\n[TRANG ĐĂNG NHẬP]...")
+            else:
+                if is_admin():
+                    print("[ADMIN] đang thực hiện...")
+                else:
+                    print("[USER] đang thực hiện...")
+            st.session_state.last_printed_state = current_state_key
+            st.session_state.last_print_time = time.time()
+
+        st.session_state.last_page = current_page
+        st.session_state.last_login_state = current_login_state
+        st.session_state.last_user_role = current_user_role
+        st.session_state.last_action_trigger += 1
 
     if not is_logged_in():
         if st.session_state.page == "register":
@@ -22,29 +69,14 @@ def main():
             login_page()
     else:
         if is_admin():
-            if os.path.exists("pages/admin.py"):
-                st.switch_page("pages/admin.py")
-            else:
-                st.error("Không tìm thấy trang quản trị. Kiểm tra file `pages/admin.py`.")
-                st.stop()
+            admin_main()
         else:
-            st.sidebar.title("Điều hướng")
-            st.sidebar.text(f"Đăng nhập với: {st.session_state.username}")
-            st.sidebar.text(f"Quyền: Người dùng")
-
-            page = st.sidebar.radio("Chọn trang", ["Điểm danh"], index=0)
-            # st.write(f"[DEBUG] Trang được chọn: {page}")
-
             if st.session_state.get("just_logged_in", False):
                 st.session_state.page = "Điểm danh"
                 st.session_state.just_logged_in = False
                 st.rerun()
+            attendance_main()
 
-            if os.path.exists("pages/attendance.py"):
-                st.switch_page("pages/attendance.py")
-            else:
-                st.error("Không tìm thấy trang điểm danh. Kiểm tra file `pages/attendance.py`.")
-                st.stop()
 
 if __name__ == "__main__":
     main()

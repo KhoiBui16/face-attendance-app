@@ -1,0 +1,29 @@
+[
+  {
+    "username": "admin",
+    "password": "admin123",
+    "is_admin": true,
+    "is_allowed": true
+<<<<<<< HEAD:data/users.json
+=======
+  },
+  {
+    "username": "pele",
+    "password": "1",
+    "is_allowed": true,
+    "is_admin": false
+  },
+  {
+    "username": "ronaldo",
+    "password": "1",
+    "is_allowed": true,
+    "is_admin": false
+  },
+  {
+    "username": "mbappe",
+    "password": "1",
+    "is_allowed": true,
+    "is_admin": false
+>>>>>>> 7bf410c6126ac9d617e3f3296132e65f7c57f645:app/data/users.json
+  }
+]
